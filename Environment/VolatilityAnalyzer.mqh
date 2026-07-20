@@ -155,9 +155,8 @@ public:
      }
   };
 
-// TODO(Phase3-2): Add RangeDetector to publish range facts through CDataBus.
-// TODO(Phase3-2): Add TrendDetector to publish trend facts through CDataBus.
-// TODO(Phase3-2): Add MarketStateIntegrator to combine published facts through CDataBus.
+// TODO(Phase3-2.3): Add TrendDetector to publish trend facts through CDataBus.
+// TODO(Phase3-2.4): Add MarketStateIntegrator to combine published facts through CDataBus.
 
 #endif // FENX_ENVIRONMENT_VOLATILITY_ANALYZER_MQH
 

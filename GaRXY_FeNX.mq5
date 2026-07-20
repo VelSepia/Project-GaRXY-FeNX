@@ -7,12 +7,14 @@
 #property strict
 
 #include "Core/CoreController.mqh"
+#include "Environment/RangeDetector.mqh"
 #include "Environment/VolatilityAnalyzer.mqh"
 
 //--- Framework-wide services
 CParameterManager g_parameters;
 CCoreController   g_controller;
 CVolatilityAnalyzer g_volatility_analyzer;
+CRangeDetector      g_range_detector;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -28,6 +30,12 @@ int OnInit()
    if(!g_controller.RegisterEngine(g_volatility_analyzer))
      {
       CLogger::Error("Unable to register VolatilityAnalyzer.");
+      return(INIT_FAILED);
+     }
+
+   if(!g_controller.RegisterEngine(g_range_detector))
+     {
+      CLogger::Error("Unable to register RangeDetector.");
       return(INIT_FAILED);
      }
 

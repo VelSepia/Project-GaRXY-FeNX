@@ -16,6 +16,16 @@ private:
    int    m_volatility_baseline_samples;
    double m_volatility_low_score;
    double m_volatility_high_score;
+   int    m_range_lookback_bars;
+   double m_range_boundary_trim_fraction;
+   int    m_range_min_boundary_touches;
+   double m_range_min_width_points;
+   double m_range_min_width_atr_multiple;
+   double m_range_max_width_atr_multiple;
+   double m_range_touch_tolerance_atr_fraction;
+   double m_range_break_buffer_atr_fraction;
+   int    m_range_max_break_events;
+   double m_range_score_threshold;
 
 public:
                      CParameterManager(void)
@@ -39,6 +49,16 @@ public:
       m_volatility_baseline_samples=20;
       m_volatility_low_score=35.0;
       m_volatility_high_score=65.0;
+      m_range_lookback_bars=40;
+      m_range_boundary_trim_fraction=0.10;
+      m_range_min_boundary_touches=2;
+      m_range_min_width_points=20.0;
+      m_range_min_width_atr_multiple=0.75;
+      m_range_max_width_atr_multiple=6.00;
+      m_range_touch_tolerance_atr_fraction=0.20;
+      m_range_break_buffer_atr_fraction=0.15;
+      m_range_max_break_events=4;
+      m_range_score_threshold=65.0;
      }
 
    int               UpdateIntervalSeconds(void)
@@ -69,6 +89,56 @@ public:
    double            VolatilityHighScore(void)
      {
       return(m_volatility_high_score);
+     }
+
+   int               RangeLookbackBars(void)
+     {
+      return(m_range_lookback_bars);
+     }
+
+   double            RangeBoundaryTrimFraction(void)
+     {
+      return(m_range_boundary_trim_fraction);
+     }
+
+   int               RangeMinBoundaryTouches(void)
+     {
+      return(m_range_min_boundary_touches);
+     }
+
+   double            RangeMinWidthPoints(void)
+     {
+      return(m_range_min_width_points);
+     }
+
+   double            RangeMinWidthAtrMultiple(void)
+     {
+      return(m_range_min_width_atr_multiple);
+     }
+
+   double            RangeMaxWidthAtrMultiple(void)
+     {
+      return(m_range_max_width_atr_multiple);
+     }
+
+   double            RangeTouchToleranceAtrFraction(void)
+     {
+      return(m_range_touch_tolerance_atr_fraction);
+     }
+
+   double            RangeBreakBufferAtrFraction(void)
+     {
+      return(m_range_break_buffer_atr_fraction);
+     }
+
+   int               RangeMaxBreakEvents(void)
+     {
+      return(m_range_max_break_events);
+     }
+
+   double            RangeScoreThreshold(void)
+     {
+      return(m_range_score_threshold);
      }
   };
 
