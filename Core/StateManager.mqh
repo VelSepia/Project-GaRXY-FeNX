@@ -87,6 +87,21 @@ public:
       return(true);
      }
 
+   bool              RequestTransition(const ENUM_FENX_STATE next_state,const string requester)
+     {
+      if(m_current_state==next_state)
+         return(true);
+
+      if(!TransitionTo(next_state))
+        {
+         CLogger::Warning(StringFormat("State transition request from %s was rejected.",
+                                       requester));
+         return(false);
+        }
+
+      return(true);
+     }
+
    string            StateName(const ENUM_FENX_STATE state)
      {
       switch(state)
@@ -104,4 +119,3 @@ public:
   };
 
 #endif // FENX_CORE_STATE_MANAGER_MQH
-

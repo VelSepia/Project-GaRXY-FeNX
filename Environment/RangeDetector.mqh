@@ -20,6 +20,7 @@ struct SRangeSnapshot
    bool     is_range;
    bool     is_data_valid;
    datetime updated_at;
+   datetime closed_bar_time;
   };
 
 //--- Detects stable, non-directional price ranges from completed candles only.
@@ -48,6 +49,7 @@ private:
       snapshot.is_range=false;
       snapshot.is_data_valid=false;
       snapshot.updated_at=TimeCurrent();
+      snapshot.closed_bar_time=0;
      }
 
    bool ReadAtrFromDataBus(double &atr)
@@ -231,6 +233,7 @@ private:
                          atr_multiple<=m_max_width_atr_multiple &&
                          touch_score>=100.0);
       snapshot.updated_at=TimeCurrent();
+      snapshot.closed_bar_time=rates[bar_count-1].time;
       return(true);
      }
 
@@ -267,6 +270,9 @@ private:
          success=false;
       if(!m_data_bus.SetText(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_UPDATED_AT,
                              TimeToString(snapshot.updated_at,TIME_DATE|TIME_SECONDS)))
+         success=false;
+      if(!m_data_bus.SetText(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_CLOSED_BAR_TIME,
+                             TimeToString(snapshot.closed_bar_time,TIME_DATE|TIME_SECONDS)))
          success=false;
 
       return(success);
@@ -352,4 +358,3 @@ public:
   };
 
 #endif // FENX_ENVIRONMENT_RANGE_DETECTOR_MQH
-

@@ -16,6 +16,7 @@
 #include "CapitalAllocation/CapitalAllocationEngine.mqh"
 #include "TradingStyle/TradingStyleEngine.mqh"
 #include "Strategy/StrategySelectionEngine.mqh"
+#include "Standby/StandbyEngine.mqh"
 
 //--- Framework-wide services
 CParameterManager g_parameters;
@@ -29,6 +30,7 @@ CPairRankingEngine     g_pair_ranking_engine;
 CCapitalAllocationEngine g_capital_allocation_engine;
 CTradingStyleEngine      g_trading_style_engine;
 CStrategySelectionEngine g_strategy_selection_engine;
+CStandbyEngine           g_standby_engine;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -95,6 +97,12 @@ int OnInit()
       return(INIT_FAILED);
      }
 
+   if(!g_controller.RegisterEngine(g_standby_engine))
+     {
+      CLogger::Error("Unable to register StandbyEngine.");
+      return(INIT_FAILED);
+     }
+
    if(!g_controller.Initialize(g_parameters))
       return(INIT_FAILED);
 
@@ -116,4 +124,3 @@ void OnTick()
   {
    g_controller.Update();
   }
-

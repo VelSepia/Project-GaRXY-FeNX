@@ -7,7 +7,7 @@
 //--- Framework identifiers and conservative Phase3-1 limits
 #define FENX_EA_NAME           "GaRXY FeNX"
 #define FENX_MAX_ENGINES       32
-#define FENX_DATABUS_CAPACITY  192
+#define FENX_DATABUS_CAPACITY  256
 #define FENX_MARKET_SELECTION_MAX_SYMBOLS 4
 #define FENX_PAIR_RANKING_COMPARE_EPSILON 0.0001
 
@@ -26,6 +26,7 @@
 #define FENX_DATABUS_KEY_ENVIRONMENT_IS_RANGE             "Environment.Range.IsRange"
 #define FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID     "Environment.Range.IsDataValid"
 #define FENX_DATABUS_KEY_ENVIRONMENT_RANGE_UPDATED_AT     "Environment.Range.UpdatedAt"
+#define FENX_DATABUS_KEY_ENVIRONMENT_RANGE_CLOSED_BAR_TIME "Environment.Range.ClosedBarTime"
 
 //--- Environment trend-analysis DataBus keys
 #define FENX_DATABUS_KEY_ENVIRONMENT_TREND_DIRECTION      "Environment.Trend.Direction"
@@ -120,5 +121,28 @@
 #define FENX_DATABUS_KEY_STRATEGY_SELECTION_DATA_VALID           "StrategySelection.StrategySelectionDataValid"
 #define FENX_DATABUS_KEY_STRATEGY_SELECTION_UPDATED_AT           "StrategySelection.StrategySelectionUpdatedAt"
 
-#endif // FENX_COMMON_CONSTANTS_MQH
+//--- Per-symbol Standby Engine DataBus namespace and field names
+#define FENX_DATABUS_NAMESPACE_STANDBY                             "Standby"
+#define FENX_DATABUS_FIELD_STANDBY_STATE                           "StandbyState"
+#define FENX_DATABUS_FIELD_STANDBY_IS_ACTIVE                       "IsStandbyActive"
+#define FENX_DATABUS_FIELD_STANDBY_NEW_ENTRIES_ALLOWED            "AreNewEntriesAllowed"
+#define FENX_DATABUS_FIELD_STANDBY_PRESERVE_POSITIONS              "PreserveExistingPositions"
+#define FENX_DATABUS_FIELD_STANDBY_REASON                          "StandbyReason"
+#define FENX_DATABUS_FIELD_STANDBY_CONFIDENCE                      "StandbyConfidence"
+#define FENX_DATABUS_FIELD_STANDBY_ENTERED_AT                      "StandbyEnteredAt"
+#define FENX_DATABUS_FIELD_STANDBY_DURATION_SECONDS                "StandbyDurationSeconds"
+#define FENX_DATABUS_FIELD_STANDBY_RECOVERY_PROGRESS               "RecoveryProgress"
+#define FENX_DATABUS_FIELD_STANDBY_ESCALATION_SCORE                "EscalationScore"
+#define FENX_DATABUS_FIELD_STANDBY_RECOMMENDED_NEXT_STATE          "RecommendedNextState"
+#define FENX_DATABUS_FIELD_STANDBY_DATA_VALID                      "StandbyDataValid"
+#define FENX_DATABUS_FIELD_STANDBY_UPDATED_AT                      "StandbyUpdatedAt"
 
+//--- Global Standby Engine DataBus keys
+#define FENX_DATABUS_KEY_STANDBY_ACTIVE_SYMBOL_COUNT               "Standby.ActiveStandbySymbolCount"
+#define FENX_DATABUS_KEY_STANDBY_RECOVERY_PENDING_COUNT            "Standby.RecoveryPendingCount"
+#define FENX_DATABUS_KEY_STANDBY_ESCALATION_PENDING_COUNT          "Standby.EscalationPendingCount"
+#define FENX_DATABUS_KEY_STANDBY_RISK_STOP_PENDING_COUNT           "Standby.RiskStopPendingCount"
+#define FENX_DATABUS_KEY_STANDBY_SYSTEM_VALID                      "Standby.StandbySystemValid"
+#define FENX_DATABUS_KEY_STANDBY_SYSTEM_UPDATED_AT                 "Standby.StandbySystemUpdatedAt"
+
+#endif // FENX_COMMON_CONSTANTS_MQH

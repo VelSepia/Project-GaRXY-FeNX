@@ -68,8 +68,8 @@ Implement phases in order unless a documented architecture decision explicitly c
 5. Phase3-5 — Capital Allocation Engine
 6. Phase3-6 — Trading Style Engine
 7. Phase3-7 — Strategy Selection Engine
-8. Phase3-8 — Priority Decision Engine
-9. Phase3-9 — Standby Engine
+8. Phase3-8 — Standby Engine
+9. Phase3-9 — Priority Decision Engine
 10. Phase3-10 — Risk Engine
 11. Phase3-11 — Backtest
 12. Phase3-12 — Forward Test
@@ -84,8 +84,8 @@ Each phase must preserve the previous framework contracts, introduce only its as
 - TODO(CapitalAllocationEngine): Allocate capital subject to future risk constraints.
 - TODO(TradingStyleEngine): Select an approved trading style from shared context.
 - TODO(StrategySelectionEngine): Select a strategy without directly executing trades.
-- TODO(PriorityDecisionEngine): Coordinate priority decisions from DataBus outputs.
 - TODO(StandbyEngine): Define safe standby behavior and recovery conditions.
+- TODO(PriorityDecisionEngine): Coordinate priority decisions from DataBus outputs.
 - TODO(RiskEngine): Enforce risk-stop and capital-protection rules in Phase3-10.
 
 No future engine may be implemented outside its assigned phase without updating this guide and documenting the architectural reason.

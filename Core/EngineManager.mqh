@@ -67,7 +67,8 @@ public:
       return(true);
      }
 
-   bool              Initialize(CDataBus &data_bus,CParameterManager &parameters)
+   bool              Initialize(CDataBus &data_bus,CParameterManager &parameters,
+                                CStateManager &state_manager)
      {
       if(m_initialized)
          return(true);
@@ -79,8 +80,10 @@ public:
            {
             CLogger::Error("EngineManager found an invalid engine pointer.");
             Shutdown();
-            return(false);
+           return(false);
            }
+
+         m_engines[index].SetStateManager(state_manager);
 
          if(!m_engines[index].Initialize(data_bus,parameters))
            {
@@ -128,4 +131,3 @@ public:
   };
 
 #endif // FENX_CORE_ENGINE_MANAGER_MQH
-

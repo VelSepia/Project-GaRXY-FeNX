@@ -14,7 +14,7 @@ The detector derives stable lower and upper boundaries from trimmed low and high
 
 ## RangeScore
 
-`RangeScore` is normalized to 0窶・00. It combines five factors:
+`RangeScore` is normalized to 0–100. It combines five factors:
 
 - 30% closed-price containment within the stable boundaries;
 - 20% touches of both boundaries;
@@ -28,3 +28,6 @@ The detector derives stable lower and upper boundaries from trimmed low and high
 
 `CParameterManager` controls the detector with the range lookback, boundary trim fraction, minimum boundary touches, minimum absolute and ATR-relative width, touch tolerance, break buffer, maximum weighted break events, and score threshold. ATR is read only from the existing `Environment.Volatility.ATR` DataBus field.
 
+## Closed-bar timestamp
+
+`Environment.Range.ClosedBarTime` is the open time of the newest completed candle used for the snapshot. It is published alongside the range facts so downstream engines can require confirmations exactly once per completed bar without reading price data directly.

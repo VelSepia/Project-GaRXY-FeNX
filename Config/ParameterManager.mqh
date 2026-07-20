@@ -84,6 +84,18 @@ private:
    double m_strategy_selection_transition_penalty;
    int    m_strategy_selection_stale_data_limit_seconds;
    double m_strategy_selection_no_trade_safety_threshold;
+   int    m_standby_entry_confirmation_bars;
+   int    m_standby_recovery_confirmation_bars;
+   int    m_standby_max_duration_seconds;
+   double m_standby_breakout_distance_points;
+   double m_standby_breakout_distance_atr_multiple;
+   double m_standby_min_range_recovery_score;
+   double m_standby_trend_escalation_threshold;
+   double m_standby_volatility_escalation_threshold;
+   double m_standby_confidence_recovery_threshold;
+   double m_standby_confidence_failure_threshold;
+   int    m_standby_transition_cooldown_seconds;
+   int    m_standby_stale_data_grace_seconds;
 
 public:
                      CParameterManager(void)
@@ -175,6 +187,18 @@ public:
       m_strategy_selection_transition_penalty=10.0;
       m_strategy_selection_stale_data_limit_seconds=5;
       m_strategy_selection_no_trade_safety_threshold=40.0;
+      m_standby_entry_confirmation_bars=2;
+      m_standby_recovery_confirmation_bars=2;
+      m_standby_max_duration_seconds=900;
+      m_standby_breakout_distance_points=10.0;
+      m_standby_breakout_distance_atr_multiple=0.15;
+      m_standby_min_range_recovery_score=65.0;
+      m_standby_trend_escalation_threshold=70.0;
+      m_standby_volatility_escalation_threshold=85.0;
+      m_standby_confidence_recovery_threshold=65.0;
+      m_standby_confidence_failure_threshold=40.0;
+      m_standby_transition_cooldown_seconds=30;
+      m_standby_stale_data_grace_seconds=15;
      }
 
    int               UpdateIntervalSeconds(void)
@@ -571,7 +595,66 @@ public:
      {
       return(m_strategy_selection_no_trade_safety_threshold);
      }
+
+   int               StandbyEntryConfirmationBars(void)
+     {
+      return(m_standby_entry_confirmation_bars);
+     }
+
+   int               StandbyRecoveryConfirmationBars(void)
+     {
+      return(m_standby_recovery_confirmation_bars);
+     }
+
+   int               StandbyMaxDurationSeconds(void)
+     {
+      return(m_standby_max_duration_seconds);
+     }
+
+   double            StandbyBreakoutDistancePoints(void)
+     {
+      return(m_standby_breakout_distance_points);
+     }
+
+   double            StandbyBreakoutDistanceAtrMultiple(void)
+     {
+      return(m_standby_breakout_distance_atr_multiple);
+     }
+
+   double            StandbyMinRangeRecoveryScore(void)
+     {
+      return(m_standby_min_range_recovery_score);
+     }
+
+   double            StandbyTrendEscalationThreshold(void)
+     {
+      return(m_standby_trend_escalation_threshold);
+     }
+
+   double            StandbyVolatilityEscalationThreshold(void)
+     {
+      return(m_standby_volatility_escalation_threshold);
+     }
+
+   double            StandbyConfidenceRecoveryThreshold(void)
+     {
+      return(m_standby_confidence_recovery_threshold);
+     }
+
+   double            StandbyConfidenceFailureThreshold(void)
+     {
+      return(m_standby_confidence_failure_threshold);
+     }
+
+   int               StandbyTransitionCooldownSeconds(void)
+     {
+      return(m_standby_transition_cooldown_seconds);
+     }
+
+   int               StandbyStaleDataGraceSeconds(void)
+     {
+      return(m_standby_stale_data_grace_seconds);
+     }
   };
 
 #endif // FENX_CONFIG_PARAMETER_MANAGER_MQH
-

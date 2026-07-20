@@ -15,6 +15,7 @@ protected:
    bool               m_initialized;
    CDataBus           *m_data_bus;
    CParameterManager  *m_parameters;
+   CStateManager      *m_state_manager;
 
 public:
                      CBaseEngine(void)
@@ -23,6 +24,12 @@ public:
       m_initialized=false;
       m_data_bus=NULL;
       m_parameters=NULL;
+      m_state_manager=NULL;
+     }
+
+   virtual void       SetStateManager(CStateManager &state_manager)
+     {
+      m_state_manager=GetPointer(state_manager);
      }
 
    virtual bool       Initialize(CDataBus &data_bus,CParameterManager &parameters)
@@ -44,6 +51,7 @@ public:
       m_initialized=false;
       m_data_bus=NULL;
       m_parameters=NULL;
+      m_state_manager=NULL;
       CLogger::Info(StringFormat("%s shut down.",m_name));
      }
 
@@ -65,4 +73,3 @@ public:
   };
 
 #endif // FENX_ENGINE_BASE_ENGINE_MQH
-

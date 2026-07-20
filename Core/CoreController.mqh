@@ -36,7 +36,7 @@ public:
       m_state_manager.Reset();
 
       // TODO(Phase3-3+): Register additional engines as their dedicated phases begin.
-      if(!m_engine_manager.Initialize(m_data_bus,parameters))
+      if(!m_engine_manager.Initialize(m_data_bus,parameters,m_state_manager))
         {
          m_state_manager.TransitionTo(FENX_STATE_SHUTDOWN);
          CLogger::Error("CoreController failed to initialize EngineManager.");
@@ -101,4 +101,3 @@ public:
   };
 
 #endif // FENX_CORE_CONTROLLER_MQH
-
