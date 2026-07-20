@@ -7,8 +7,9 @@
 //--- Framework identifiers and conservative Phase3-1 limits
 #define FENX_EA_NAME           "GaRXY FeNX"
 #define FENX_MAX_ENGINES       32
-#define FENX_DATABUS_CAPACITY  64
+#define FENX_DATABUS_CAPACITY  128
 #define FENX_MARKET_SELECTION_MAX_SYMBOLS 4
+#define FENX_PAIR_RANKING_COMPARE_EPSILON 0.0001
 
 //--- Environment Engine DataBus keys
 #define FENX_DATABUS_KEY_ENVIRONMENT_ATR               "Environment.Volatility.ATR"
@@ -54,6 +55,23 @@
 #define FENX_DATABUS_FIELD_MARKET_SELECTION_SPREAD_ATR    "SpreadToATRRatio"
 #define FENX_DATABUS_FIELD_MARKET_SELECTION_REJECTION     "RejectionReason"
 #define FENX_DATABUS_FIELD_MARKET_SELECTION_UPDATED_AT    "MarketSelectionUpdatedAt"
+
+//--- Per-symbol Pair Ranking DataBus namespace and field names
+#define FENX_DATABUS_NAMESPACE_PAIR_RANKING                "PairRanking"
+#define FENX_DATABUS_FIELD_PAIR_RANKING_SYMBOL             "Symbol"
+#define FENX_DATABUS_FIELD_PAIR_RANKING_RANK               "PairRank"
+#define FENX_DATABUS_FIELD_PAIR_RANKING_SCORE              "PairRankingScore"
+#define FENX_DATABUS_FIELD_PAIR_RANKING_CONFIDENCE         "PairRankingConfidence"
+#define FENX_DATABUS_FIELD_PAIR_RANKING_IS_RANKED          "IsPairRanked"
+#define FENX_DATABUS_FIELD_PAIR_RANKING_REASON             "PairRankingReason"
+#define FENX_DATABUS_FIELD_PAIR_RANKING_UPDATED_AT         "PairRankingUpdatedAt"
+
+//--- Global Pair Ranking DataBus keys
+#define FENX_DATABUS_KEY_PAIR_RANKING_SYMBOL_COUNT         "PairRanking.RankedSymbolCount"
+#define FENX_DATABUS_KEY_PAIR_RANKING_TOP_SYMBOL           "PairRanking.TopRankedSymbol"
+#define FENX_DATABUS_KEY_PAIR_RANKING_TOP_SCORE            "PairRanking.TopRankingScore"
+#define FENX_DATABUS_KEY_PAIR_RANKING_DATA_VALID           "PairRanking.RankingDataValid"
+#define FENX_DATABUS_KEY_PAIR_RANKING_UPDATED_AT           "PairRanking.RankingUpdatedAt"
 
 #endif // FENX_COMMON_CONSTANTS_MQH
 

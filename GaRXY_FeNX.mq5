@@ -12,6 +12,7 @@
 #include "Environment/TrendDetector.mqh"
 #include "Environment/VolatilityAnalyzer.mqh"
 #include "MarketSelection/MarketSelectionEngine.mqh"
+#include "PairRanking/PairRankingEngine.mqh"
 
 //--- Framework-wide services
 CParameterManager g_parameters;
@@ -21,6 +22,7 @@ CRangeDetector      g_range_detector;
 CTrendDetector      g_trend_detector;
 CMarketStateIntegrator g_market_state_integrator;
 CMarketSelectionEngine g_market_selection_engine;
+CPairRankingEngine     g_pair_ranking_engine;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -60,6 +62,12 @@ int OnInit()
    if(!g_controller.RegisterEngine(g_market_selection_engine))
      {
       CLogger::Error("Unable to register MarketSelectionEngine.");
+      return(INIT_FAILED);
+     }
+
+   if(!g_controller.RegisterEngine(g_pair_ranking_engine))
+     {
+      CLogger::Error("Unable to register PairRankingEngine.");
       return(INIT_FAILED);
      }
 

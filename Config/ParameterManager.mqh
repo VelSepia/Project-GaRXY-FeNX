@@ -51,6 +51,14 @@ private:
    double m_market_selection_max_volatility_score;
    double m_market_selection_min_score;
    double m_market_selection_transition_penalty;
+   int    m_pair_ranking_max_data_age_seconds;
+   double m_pair_ranking_weight_selection_score;
+   double m_pair_ranking_weight_selection_confidence;
+   double m_pair_ranking_weight_spread_efficiency;
+   double m_pair_ranking_weight_environment_confidence;
+   double m_pair_ranking_weight_volatility_suitability;
+   double m_pair_ranking_weight_regime_suitability;
+   double m_pair_ranking_weight_freshness;
 
 public:
                      CParameterManager(void)
@@ -109,6 +117,14 @@ public:
       m_market_selection_max_volatility_score=80.0;
       m_market_selection_min_score=60.0;
       m_market_selection_transition_penalty=30.0;
+      m_pair_ranking_max_data_age_seconds=5;
+      m_pair_ranking_weight_selection_score=0.25;
+      m_pair_ranking_weight_selection_confidence=0.15;
+      m_pair_ranking_weight_spread_efficiency=0.15;
+      m_pair_ranking_weight_environment_confidence=0.15;
+      m_pair_ranking_weight_volatility_suitability=0.10;
+      m_pair_ranking_weight_regime_suitability=0.10;
+      m_pair_ranking_weight_freshness=0.10;
      }
 
    int               UpdateIntervalSeconds(void)
@@ -339,6 +355,46 @@ public:
    double            MarketSelectionTransitionPenalty(void)
      {
       return(m_market_selection_transition_penalty);
+     }
+
+   int               PairRankingMaxDataAgeSeconds(void)
+     {
+      return(m_pair_ranking_max_data_age_seconds);
+     }
+
+   double            PairRankingWeightSelectionScore(void)
+     {
+      return(m_pair_ranking_weight_selection_score);
+     }
+
+   double            PairRankingWeightSelectionConfidence(void)
+     {
+      return(m_pair_ranking_weight_selection_confidence);
+     }
+
+   double            PairRankingWeightSpreadEfficiency(void)
+     {
+      return(m_pair_ranking_weight_spread_efficiency);
+     }
+
+   double            PairRankingWeightEnvironmentConfidence(void)
+     {
+      return(m_pair_ranking_weight_environment_confidence);
+     }
+
+   double            PairRankingWeightVolatilitySuitability(void)
+     {
+      return(m_pair_ranking_weight_volatility_suitability);
+     }
+
+   double            PairRankingWeightRegimeSuitability(void)
+     {
+      return(m_pair_ranking_weight_regime_suitability);
+     }
+
+   double            PairRankingWeightFreshness(void)
+     {
+      return(m_pair_ranking_weight_freshness);
      }
   };
 
