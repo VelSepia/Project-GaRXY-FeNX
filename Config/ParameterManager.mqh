@@ -37,6 +37,11 @@ private:
    double m_trend_direction_score_threshold;
    double m_trend_strength_threshold;
    double m_trend_confidence_threshold;
+   double m_market_range_score_threshold;
+   double m_market_range_max_trend_score;
+   double m_market_trend_score_threshold;
+   double m_market_volatility_score_threshold;
+   double m_market_trend_min_adx;
 
 public:
                      CParameterManager(void)
@@ -81,6 +86,11 @@ public:
       m_trend_direction_score_threshold=20.0;
       m_trend_strength_threshold=60.0;
       m_trend_confidence_threshold=60.0;
+      m_market_range_score_threshold=70.0;
+      m_market_range_max_trend_score=40.0;
+      m_market_trend_score_threshold=70.0;
+      m_market_volatility_score_threshold=80.0;
+      m_market_trend_min_adx=20.0;
      }
 
    int               UpdateIntervalSeconds(void)
@@ -216,6 +226,31 @@ public:
    double            TrendConfidenceThreshold(void)
      {
       return(m_trend_confidence_threshold);
+     }
+
+   double            MarketRangeScoreThreshold(void)
+     {
+      return(m_market_range_score_threshold);
+     }
+
+   double            MarketRangeMaxTrendScore(void)
+     {
+      return(m_market_range_max_trend_score);
+     }
+
+   double            MarketTrendScoreThreshold(void)
+     {
+      return(m_market_trend_score_threshold);
+     }
+
+   double            MarketVolatilityScoreThreshold(void)
+     {
+      return(m_market_volatility_score_threshold);
+     }
+
+   double            MarketTrendMinAdx(void)
+     {
+      return(m_market_trend_min_adx);
      }
   };
 

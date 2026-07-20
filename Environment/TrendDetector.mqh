@@ -16,6 +16,7 @@ struct STrendSnapshot
    double   score;
    double   slope_points;
    double   confidence;
+   double   adx;
    bool     is_trend;
    bool     is_data_valid;
    datetime updated_at;
@@ -46,6 +47,7 @@ private:
       snapshot.score=0.0;
       snapshot.slope_points=0.0;
       snapshot.confidence=0.0;
+      snapshot.adx=0.0;
       snapshot.is_trend=false;
       snapshot.is_data_valid=false;
       snapshot.updated_at=TimeCurrent();
@@ -232,6 +234,7 @@ private:
       snapshot.confidence=CalculateConfidence(snapshot.direction,slope_atr,
                                               up_structure,down_structure,plus_di,
                                               minus_di,net_movement,noise_score);
+      snapshot.adx=adx;
       snapshot.is_data_valid=true;
       snapshot.is_trend=(snapshot.direction!="NEUTRAL" &&
                          snapshot.strength>=m_strength_threshold &&
@@ -261,6 +264,9 @@ private:
          success=false;
       if(!m_data_bus.SetText(FENX_DATABUS_KEY_ENVIRONMENT_TREND_CONFIDENCE,
                              DoubleToString(snapshot.confidence,2)))
+         success=false;
+      if(!m_data_bus.SetText(FENX_DATABUS_KEY_ENVIRONMENT_TREND_ADX,
+                             DoubleToString(snapshot.adx,2)))
          success=false;
       if(!m_data_bus.SetText(FENX_DATABUS_KEY_ENVIRONMENT_IS_TREND,
                              (snapshot.is_trend ? "true" : "false")))

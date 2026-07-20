@@ -20,7 +20,7 @@ The detector combines five components:
 - net closed-price movement normalized by ATR; and
 - an ATR-based noise band that filters insignificant candle-to-candle movement.
 
-`TrendScore` is signed from -100 to 100, where positive values favor `UP` and negative values favor `DOWN`. `TrendStrength` is the strongest directional evidence. `TrendConfidence` measures the agreement of slope, structure, DI, and net movement after noise filtering. `IsTrend` requires direction, ADX, strength, and confidence to meet their configured thresholds.
+`TrendScore` is signed from -100 to 100, where positive values favor `UP` and negative values favor `DOWN`. `TrendStrength` is the strongest directional evidence. `TrendConfidence` measures the agreement of slope, structure, DI, and net movement after noise filtering. `TrendAdx` publishes the last completed-bar ADX for DataBus consumers. `IsTrend` requires direction, ADX, strength, and confidence to meet their configured thresholds.
 
 ## Parameters
 

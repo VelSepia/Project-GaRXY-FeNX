@@ -155,7 +155,5 @@ public:
      }
   };
 
-// TODO(Phase3-2.4): Add MarketStateIntegrator to combine published facts through CDataBus.
-
 #endif // FENX_ENVIRONMENT_VOLATILITY_ANALYZER_MQH
 
