@@ -7,7 +7,7 @@
 //--- Framework identifiers and conservative Phase3-1 limits
 #define FENX_EA_NAME           "GaRXY FeNX"
 #define FENX_MAX_ENGINES       32
-#define FENX_DATABUS_CAPACITY  256
+#define FENX_DATABUS_CAPACITY  320
 #define FENX_MARKET_SELECTION_MAX_SYMBOLS 4
 #define FENX_PAIR_RANKING_COMPARE_EPSILON 0.0001
 
@@ -144,5 +144,34 @@
 #define FENX_DATABUS_KEY_STANDBY_RISK_STOP_PENDING_COUNT           "Standby.RiskStopPendingCount"
 #define FENX_DATABUS_KEY_STANDBY_SYSTEM_VALID                      "Standby.StandbySystemValid"
 #define FENX_DATABUS_KEY_STANDBY_SYSTEM_UPDATED_AT                 "Standby.StandbySystemUpdatedAt"
+
+//--- Per-symbol Risk Engine DataBus namespace and field names
+#define FENX_DATABUS_NAMESPACE_RISK                                "Risk"
+#define FENX_DATABUS_FIELD_SYMBOL_RISK_STATE                       "SymbolRiskState"
+#define FENX_DATABUS_FIELD_RISK_ACTION                             "RiskAction"
+#define FENX_DATABUS_FIELD_IS_RISK_APPROVED                        "IsRiskApproved"
+#define FENX_DATABUS_FIELD_NEW_ENTRIES_RISK_APPROVED               "AreNewEntriesRiskApproved"
+#define FENX_DATABUS_FIELD_RECOMMENDED_ALLOCATION_MULTIPLIER       "RecommendedAllocationMultiplier"
+#define FENX_DATABUS_FIELD_RISK_SCORE                              "RiskScore"
+#define FENX_DATABUS_FIELD_RISK_CONFIDENCE                         "RiskConfidence"
+#define FENX_DATABUS_FIELD_RISK_REASON                             "RiskReason"
+#define FENX_DATABUS_FIELD_RISK_PRESERVE_POSITIONS                 "PreserveExistingPositions"
+#define FENX_DATABUS_FIELD_RISK_ESCALATION_REQUIRED                "RiskEscalationRequired"
+#define FENX_DATABUS_FIELD_RISK_DATA_VALID                         "RiskDataValid"
+#define FENX_DATABUS_FIELD_RISK_UPDATED_AT                         "RiskUpdatedAt"
+
+//--- Global Risk Engine DataBus keys
+#define FENX_DATABUS_KEY_RISK_SYSTEM_STATE                         "Risk.SystemRiskState"
+#define FENX_DATABUS_KEY_RISK_SYSTEM_SCORE                         "Risk.SystemRiskScore"
+#define FENX_DATABUS_KEY_RISK_SYSTEM_CONFIDENCE                    "Risk.SystemRiskConfidence"
+#define FENX_DATABUS_KEY_RISK_SYSTEM_TRADING_ALLOWED               "Risk.SystemTradingAllowed"
+#define FENX_DATABUS_KEY_RISK_SYSTEM_NEW_ENTRIES_ALLOWED           "Risk.SystemNewEntriesAllowed"
+#define FENX_DATABUS_KEY_RISK_SYSTEM_ALLOCATION_MULTIPLIER         "Risk.SystemAllocationMultiplier"
+#define FENX_DATABUS_KEY_RISK_SUSPENDED_SYMBOL_COUNT               "Risk.SuspendedSymbolCount"
+#define FENX_DATABUS_KEY_RISK_STOP_REQUIRED_COUNT                  "Risk.RiskStopRequiredCount"
+#define FENX_DATABUS_KEY_RISK_INVALID_SYMBOL_COUNT                 "Risk.InvalidRiskSymbolCount"
+#define FENX_DATABUS_KEY_RISK_SYSTEM_REASON                        "Risk.SystemRiskReason"
+#define FENX_DATABUS_KEY_RISK_SYSTEM_DATA_VALID                    "Risk.SystemRiskDataValid"
+#define FENX_DATABUS_KEY_RISK_SYSTEM_UPDATED_AT                    "Risk.SystemRiskUpdatedAt"
 
 #endif // FENX_COMMON_CONSTANTS_MQH

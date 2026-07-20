@@ -17,6 +17,7 @@
 #include "TradingStyle/TradingStyleEngine.mqh"
 #include "Strategy/StrategySelectionEngine.mqh"
 #include "Standby/StandbyEngine.mqh"
+#include "Risk/RiskEngine.mqh"
 
 //--- Framework-wide services
 CParameterManager g_parameters;
@@ -31,6 +32,7 @@ CCapitalAllocationEngine g_capital_allocation_engine;
 CTradingStyleEngine      g_trading_style_engine;
 CStrategySelectionEngine g_strategy_selection_engine;
 CStandbyEngine           g_standby_engine;
+CRiskEngine              g_risk_engine;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -100,6 +102,12 @@ int OnInit()
    if(!g_controller.RegisterEngine(g_standby_engine))
      {
       CLogger::Error("Unable to register StandbyEngine.");
+      return(INIT_FAILED);
+     }
+
+   if(!g_controller.RegisterEngine(g_risk_engine))
+     {
+      CLogger::Error("Unable to register RiskEngine.");
       return(INIT_FAILED);
      }
 

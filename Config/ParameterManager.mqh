@@ -96,6 +96,23 @@ private:
    double m_standby_confidence_failure_threshold;
    int    m_standby_transition_cooldown_seconds;
    int    m_standby_stale_data_grace_seconds;
+   double m_risk_caution_threshold;
+   double m_risk_reduced_threshold;
+   double m_risk_suspended_threshold;
+   double m_risk_stop_threshold;
+   double m_risk_volatility_threshold;
+   double m_risk_minimum_confidence;
+   double m_risk_max_allocation_per_symbol;
+   double m_risk_max_aggregate_allocation;
+   double m_risk_max_concentration_ratio;
+   int    m_risk_stale_data_limit_seconds;
+   double m_risk_invalid_symbol_ratio_threshold;
+   double m_risk_standby_escalation_threshold;
+   int    m_risk_unsafe_confirmation_count;
+   int    m_risk_recovery_confirmation_count;
+   int    m_risk_transition_cooldown_seconds;
+   double m_risk_caution_allocation_multiplier;
+   double m_risk_reduced_allocation_multiplier;
 
 public:
                      CParameterManager(void)
@@ -199,6 +216,23 @@ public:
       m_standby_confidence_failure_threshold=40.0;
       m_standby_transition_cooldown_seconds=30;
       m_standby_stale_data_grace_seconds=15;
+      m_risk_caution_threshold=30.0;
+      m_risk_reduced_threshold=50.0;
+      m_risk_suspended_threshold=70.0;
+      m_risk_stop_threshold=85.0;
+      m_risk_volatility_threshold=80.0;
+      m_risk_minimum_confidence=60.0;
+      m_risk_max_allocation_per_symbol=40.0;
+      m_risk_max_aggregate_allocation=100.0;
+      m_risk_max_concentration_ratio=0.50;
+      m_risk_stale_data_limit_seconds=5;
+      m_risk_invalid_symbol_ratio_threshold=0.50;
+      m_risk_standby_escalation_threshold=50.0;
+      m_risk_unsafe_confirmation_count=2;
+      m_risk_recovery_confirmation_count=2;
+      m_risk_transition_cooldown_seconds=30;
+      m_risk_caution_allocation_multiplier=0.75;
+      m_risk_reduced_allocation_multiplier=0.50;
      }
 
    int               UpdateIntervalSeconds(void)
@@ -654,6 +688,91 @@ public:
    int               StandbyStaleDataGraceSeconds(void)
      {
       return(m_standby_stale_data_grace_seconds);
+     }
+
+   double            RiskCautionThreshold(void)
+     {
+      return(m_risk_caution_threshold);
+     }
+
+   double            RiskReducedThreshold(void)
+     {
+      return(m_risk_reduced_threshold);
+     }
+
+   double            RiskSuspendedThreshold(void)
+     {
+      return(m_risk_suspended_threshold);
+     }
+
+   double            RiskStopThreshold(void)
+     {
+      return(m_risk_stop_threshold);
+     }
+
+   double            RiskVolatilityThreshold(void)
+     {
+      return(m_risk_volatility_threshold);
+     }
+
+   double            RiskMinimumConfidence(void)
+     {
+      return(m_risk_minimum_confidence);
+     }
+
+   double            RiskMaxAllocationPerSymbol(void)
+     {
+      return(m_risk_max_allocation_per_symbol);
+     }
+
+   double            RiskMaxAggregateAllocation(void)
+     {
+      return(m_risk_max_aggregate_allocation);
+     }
+
+   double            RiskMaxConcentrationRatio(void)
+     {
+      return(m_risk_max_concentration_ratio);
+     }
+
+   int               RiskStaleDataLimitSeconds(void)
+     {
+      return(m_risk_stale_data_limit_seconds);
+     }
+
+   double            RiskInvalidSymbolRatioThreshold(void)
+     {
+      return(m_risk_invalid_symbol_ratio_threshold);
+     }
+
+   double            RiskStandbyEscalationThreshold(void)
+     {
+      return(m_risk_standby_escalation_threshold);
+     }
+
+   int               RiskUnsafeConfirmationCount(void)
+     {
+      return(m_risk_unsafe_confirmation_count);
+     }
+
+   int               RiskRecoveryConfirmationCount(void)
+     {
+      return(m_risk_recovery_confirmation_count);
+     }
+
+   int               RiskTransitionCooldownSeconds(void)
+     {
+      return(m_risk_transition_cooldown_seconds);
+     }
+
+   double            RiskCautionAllocationMultiplier(void)
+     {
+      return(m_risk_caution_allocation_multiplier);
+     }
+
+   double            RiskReducedAllocationMultiplier(void)
+     {
+      return(m_risk_reduced_allocation_multiplier);
      }
   };
 
