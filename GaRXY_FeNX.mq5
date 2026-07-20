@@ -13,6 +13,7 @@
 #include "Environment/VolatilityAnalyzer.mqh"
 #include "MarketSelection/MarketSelectionEngine.mqh"
 #include "PairRanking/PairRankingEngine.mqh"
+#include "CapitalAllocation/CapitalAllocationEngine.mqh"
 
 //--- Framework-wide services
 CParameterManager g_parameters;
@@ -23,6 +24,7 @@ CTrendDetector      g_trend_detector;
 CMarketStateIntegrator g_market_state_integrator;
 CMarketSelectionEngine g_market_selection_engine;
 CPairRankingEngine     g_pair_ranking_engine;
+CCapitalAllocationEngine g_capital_allocation_engine;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -71,6 +73,12 @@ int OnInit()
       return(INIT_FAILED);
      }
 
+   if(!g_controller.RegisterEngine(g_capital_allocation_engine))
+     {
+      CLogger::Error("Unable to register CapitalAllocationEngine.");
+      return(INIT_FAILED);
+     }
+
    if(!g_controller.Initialize(g_parameters))
       return(INIT_FAILED);
 
@@ -92,4 +100,3 @@ void OnTick()
   {
    g_controller.Update();
   }
-

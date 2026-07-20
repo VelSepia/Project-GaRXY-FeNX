@@ -73,5 +73,22 @@
 #define FENX_DATABUS_KEY_PAIR_RANKING_DATA_VALID           "PairRanking.RankingDataValid"
 #define FENX_DATABUS_KEY_PAIR_RANKING_UPDATED_AT           "PairRanking.RankingUpdatedAt"
 
-#endif // FENX_COMMON_CONSTANTS_MQH
+//--- Per-symbol Capital Allocation DataBus namespace and field names
+#define FENX_DATABUS_NAMESPACE_CAPITAL_ALLOCATION              "CapitalAllocation"
+#define FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_SYMBOL           "Symbol"
+#define FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_IS_ALLOCATED     "IsCapitalAllocated"
+#define FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_PERCENT          "CapitalAllocationPercent"
+#define FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_SCORE            "CapitalAllocationScore"
+#define FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_CONFIDENCE       "CapitalAllocationConfidence"
+#define FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_REASON           "CapitalAllocationReason"
+#define FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_UPDATED_AT       "CapitalAllocationUpdatedAt"
 
+//--- Global Capital Allocation DataBus keys
+#define FENX_DATABUS_KEY_CAPITAL_ALLOCATION_SYMBOL_COUNT        "CapitalAllocation.AllocatedSymbolCount"
+#define FENX_DATABUS_KEY_CAPITAL_ALLOCATION_TOTAL_PERCENT       "CapitalAllocation.TotalAllocatedPercent"
+#define FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UNALLOCATED_PERCENT "CapitalAllocation.UnallocatedPercent"
+#define FENX_DATABUS_KEY_CAPITAL_ALLOCATION_TOP_SYMBOL          "CapitalAllocation.TopAllocatedSymbol"
+#define FENX_DATABUS_KEY_CAPITAL_ALLOCATION_DATA_VALID          "CapitalAllocation.AllocationDataValid"
+#define FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UPDATED_AT          "CapitalAllocation.AllocationUpdatedAt"
+
+#endif // FENX_COMMON_CONSTANTS_MQH

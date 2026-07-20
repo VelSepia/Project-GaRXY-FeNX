@@ -59,6 +59,15 @@ private:
    double m_pair_ranking_weight_volatility_suitability;
    double m_pair_ranking_weight_regime_suitability;
    double m_pair_ranking_weight_freshness;
+   double m_capital_allocation_total_budget;
+   double m_capital_allocation_max_per_symbol;
+   double m_capital_allocation_min_threshold;
+   int    m_capital_allocation_max_funded_symbols;
+   double m_capital_allocation_concentration_limit;
+   double m_capital_allocation_confidence_threshold;
+   int    m_capital_allocation_stale_data_limit_seconds;
+   double m_capital_allocation_volatility_penalty;
+   double m_capital_allocation_transition_penalty;
 
 public:
                      CParameterManager(void)
@@ -125,6 +134,15 @@ public:
       m_pair_ranking_weight_volatility_suitability=0.10;
       m_pair_ranking_weight_regime_suitability=0.10;
       m_pair_ranking_weight_freshness=0.10;
+      m_capital_allocation_total_budget=100.0;
+      m_capital_allocation_max_per_symbol=40.0;
+      m_capital_allocation_min_threshold=5.0;
+      m_capital_allocation_max_funded_symbols=3;
+      m_capital_allocation_concentration_limit=50.0;
+      m_capital_allocation_confidence_threshold=60.0;
+      m_capital_allocation_stale_data_limit_seconds=5;
+      m_capital_allocation_volatility_penalty=40.0;
+      m_capital_allocation_transition_penalty=30.0;
      }
 
    int               UpdateIntervalSeconds(void)
@@ -396,7 +414,51 @@ public:
      {
       return(m_pair_ranking_weight_freshness);
      }
+
+   double            CapitalAllocationTotalBudget(void)
+     {
+      return(m_capital_allocation_total_budget);
+     }
+
+   double            CapitalAllocationMaxPerSymbol(void)
+     {
+      return(m_capital_allocation_max_per_symbol);
+     }
+
+   double            CapitalAllocationMinThreshold(void)
+     {
+      return(m_capital_allocation_min_threshold);
+     }
+
+   int               CapitalAllocationMaxFundedSymbols(void)
+     {
+      return(m_capital_allocation_max_funded_symbols);
+     }
+
+   double            CapitalAllocationConcentrationLimit(void)
+     {
+      return(m_capital_allocation_concentration_limit);
+     }
+
+   double            CapitalAllocationConfidenceThreshold(void)
+     {
+      return(m_capital_allocation_confidence_threshold);
+     }
+
+   int               CapitalAllocationStaleDataLimitSeconds(void)
+     {
+      return(m_capital_allocation_stale_data_limit_seconds);
+     }
+
+   double            CapitalAllocationVolatilityPenalty(void)
+     {
+      return(m_capital_allocation_volatility_penalty);
+     }
+
+   double            CapitalAllocationTransitionPenalty(void)
+     {
+      return(m_capital_allocation_transition_penalty);
+     }
   };
 
 #endif // FENX_CONFIG_PARAMETER_MANAGER_MQH
-
