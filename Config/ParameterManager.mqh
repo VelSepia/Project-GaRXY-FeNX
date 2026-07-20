@@ -4,6 +4,7 @@
 #ifndef FENX_CONFIG_PARAMETER_MANAGER_MQH
 #define FENX_CONFIG_PARAMETER_MANAGER_MQH
 
+#include "../Common/Constants.mqh"
 #include "../Common/Logger.mqh"
 
 //--- Owns framework configuration independently from trading logic.
@@ -42,6 +43,14 @@ private:
    double m_market_trend_score_threshold;
    double m_market_volatility_score_threshold;
    double m_market_trend_min_adx;
+   string m_market_selection_symbols[];
+   int    m_market_selection_min_history_bars;
+   double m_market_selection_max_spread_points;
+   double m_market_selection_max_spread_to_atr_ratio;
+   double m_market_selection_min_volatility_score;
+   double m_market_selection_max_volatility_score;
+   double m_market_selection_min_score;
+   double m_market_selection_transition_penalty;
 
 public:
                      CParameterManager(void)
@@ -91,6 +100,15 @@ public:
       m_market_trend_score_threshold=70.0;
       m_market_volatility_score_threshold=80.0;
       m_market_trend_min_adx=20.0;
+      ArrayResize(m_market_selection_symbols,1);
+      m_market_selection_symbols[0]=_Symbol;
+      m_market_selection_min_history_bars=100;
+      m_market_selection_max_spread_points=30.0;
+      m_market_selection_max_spread_to_atr_ratio=0.30;
+      m_market_selection_min_volatility_score=20.0;
+      m_market_selection_max_volatility_score=80.0;
+      m_market_selection_min_score=60.0;
+      m_market_selection_transition_penalty=30.0;
      }
 
    int               UpdateIntervalSeconds(void)
@@ -251,6 +269,76 @@ public:
    double            MarketTrendMinAdx(void)
      {
       return(m_market_trend_min_adx);
+     }
+
+   bool              SetMarketSelectionSymbols(string &symbols[])
+     {
+      const int symbol_count=ArraySize(symbols);
+      if(symbol_count<1 || symbol_count>FENX_MARKET_SELECTION_MAX_SYMBOLS)
+         return(false);
+
+      for(int index=0;index<symbol_count;index++)
+        {
+         if(StringLen(symbols[index])==0)
+            return(false);
+        }
+
+      if(ArrayResize(m_market_selection_symbols,symbol_count)!=symbol_count)
+         return(false);
+
+      for(int index=0;index<symbol_count;index++)
+         m_market_selection_symbols[index]=symbols[index];
+
+      return(true);
+     }
+
+   int               MarketSelectionSymbolCount(void)
+     {
+      return(ArraySize(m_market_selection_symbols));
+     }
+
+   bool              TryGetMarketSelectionSymbol(const int index,string &symbol)
+     {
+      if(index<0 || index>=ArraySize(m_market_selection_symbols))
+         return(false);
+
+      symbol=m_market_selection_symbols[index];
+      return(StringLen(symbol)>0);
+     }
+
+   int               MarketSelectionMinHistoryBars(void)
+     {
+      return(m_market_selection_min_history_bars);
+     }
+
+   double            MarketSelectionMaxSpreadPoints(void)
+     {
+      return(m_market_selection_max_spread_points);
+     }
+
+   double            MarketSelectionMaxSpreadToAtrRatio(void)
+     {
+      return(m_market_selection_max_spread_to_atr_ratio);
+     }
+
+   double            MarketSelectionMinVolatilityScore(void)
+     {
+      return(m_market_selection_min_volatility_score);
+     }
+
+   double            MarketSelectionMaxVolatilityScore(void)
+     {
+      return(m_market_selection_max_volatility_score);
+     }
+
+   double            MarketSelectionMinScore(void)
+     {
+      return(m_market_selection_min_score);
+     }
+
+   double            MarketSelectionTransitionPenalty(void)
+     {
+      return(m_market_selection_transition_penalty);
      }
   };
 

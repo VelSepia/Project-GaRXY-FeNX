@@ -11,6 +11,7 @@
 #include "Environment/RangeDetector.mqh"
 #include "Environment/TrendDetector.mqh"
 #include "Environment/VolatilityAnalyzer.mqh"
+#include "MarketSelection/MarketSelectionEngine.mqh"
 
 //--- Framework-wide services
 CParameterManager g_parameters;
@@ -19,6 +20,7 @@ CVolatilityAnalyzer g_volatility_analyzer;
 CRangeDetector      g_range_detector;
 CTrendDetector      g_trend_detector;
 CMarketStateIntegrator g_market_state_integrator;
+CMarketSelectionEngine g_market_selection_engine;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -52,6 +54,12 @@ int OnInit()
    if(!g_controller.RegisterEngine(g_market_state_integrator))
      {
       CLogger::Error("Unable to register MarketStateIntegrator.");
+      return(INIT_FAILED);
+     }
+
+   if(!g_controller.RegisterEngine(g_market_selection_engine))
+     {
+      CLogger::Error("Unable to register MarketSelectionEngine.");
       return(INIT_FAILED);
      }
 

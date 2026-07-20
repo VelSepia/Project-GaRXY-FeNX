@@ -8,6 +8,7 @@
 #define FENX_EA_NAME           "GaRXY FeNX"
 #define FENX_MAX_ENGINES       32
 #define FENX_DATABUS_CAPACITY  64
+#define FENX_MARKET_SELECTION_MAX_SYMBOLS 4
 
 //--- Environment Engine DataBus keys
 #define FENX_DATABUS_KEY_ENVIRONMENT_ATR               "Environment.Volatility.ATR"
@@ -42,6 +43,17 @@
 #define FENX_DATABUS_KEY_ENVIRONMENT_RECOMMENDED_STYLE    "Environment.Market.RecommendedTradingStyle"
 #define FENX_DATABUS_KEY_ENVIRONMENT_RECOMMENDED_RISK     "Environment.Market.RecommendedRiskLevel"
 #define FENX_DATABUS_KEY_ENVIRONMENT_MARKET_UPDATED_AT    "Environment.Market.UpdatedAt"
+
+//--- Per-symbol Market Selection DataBus namespace and field names
+#define FENX_DATABUS_NAMESPACE_MARKET_SELECTION           "MarketSelection"
+#define FENX_DATABUS_FIELD_MARKET_SELECTION_SYMBOL        "Symbol"
+#define FENX_DATABUS_FIELD_MARKET_SELECTION_IS_ELIGIBLE   "IsMarketEligible"
+#define FENX_DATABUS_FIELD_MARKET_SELECTION_SCORE         "MarketSelectionScore"
+#define FENX_DATABUS_FIELD_MARKET_SELECTION_CONFIDENCE    "MarketSelectionConfidence"
+#define FENX_DATABUS_FIELD_MARKET_SELECTION_SPREAD_POINTS "SpreadPoints"
+#define FENX_DATABUS_FIELD_MARKET_SELECTION_SPREAD_ATR    "SpreadToATRRatio"
+#define FENX_DATABUS_FIELD_MARKET_SELECTION_REJECTION     "RejectionReason"
+#define FENX_DATABUS_FIELD_MARKET_SELECTION_UPDATED_AT    "MarketSelectionUpdatedAt"
 
 #endif // FENX_COMMON_CONSTANTS_MQH
 

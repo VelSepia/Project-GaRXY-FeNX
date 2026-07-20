@@ -25,6 +25,14 @@ private:
       return(-1);
      }
 
+   string BuildSymbolKey(const string name_space,const string symbol,const string field)
+     {
+      if(StringLen(name_space)==0 || StringLen(symbol)==0 || StringLen(field)==0)
+         return("");
+
+      return(name_space+"."+symbol+"."+field);
+     }
+
 public:
    bool SetText(const string key,const string value)
      {
@@ -67,6 +75,29 @@ public:
 
       value=m_items[index].value;
       return(true);
+     }
+
+   bool SetSymbolText(const string name_space,const string symbol,const string field,
+                      const string value)
+     {
+      const string key=BuildSymbolKey(name_space,symbol,field);
+      if(StringLen(key)==0)
+        {
+         CLogger::Warning("DataBus rejected an incomplete per-symbol key.");
+         return(false);
+        }
+
+      return(SetText(key,value));
+     }
+
+   bool TryGetSymbolText(const string name_space,const string symbol,const string field,
+                         string &value)
+     {
+      const string key=BuildSymbolKey(name_space,symbol,field);
+      if(StringLen(key)==0)
+         return(false);
+
+      return(TryGetText(key,value));
      }
 
    bool Contains(const string key)
