@@ -25,5 +25,15 @@
 #define FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID     "Environment.Range.IsDataValid"
 #define FENX_DATABUS_KEY_ENVIRONMENT_RANGE_UPDATED_AT     "Environment.Range.UpdatedAt"
 
+//--- Environment trend-analysis DataBus keys
+#define FENX_DATABUS_KEY_ENVIRONMENT_TREND_DIRECTION      "Environment.Trend.Direction"
+#define FENX_DATABUS_KEY_ENVIRONMENT_TREND_STRENGTH       "Environment.Trend.Strength"
+#define FENX_DATABUS_KEY_ENVIRONMENT_TREND_SCORE          "Environment.Trend.Score"
+#define FENX_DATABUS_KEY_ENVIRONMENT_TREND_SLOPE          "Environment.Trend.Slope"
+#define FENX_DATABUS_KEY_ENVIRONMENT_TREND_CONFIDENCE     "Environment.Trend.Confidence"
+#define FENX_DATABUS_KEY_ENVIRONMENT_IS_TREND             "Environment.Trend.IsTrend"
+#define FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID     "Environment.Trend.IsDataValid"
+#define FENX_DATABUS_KEY_ENVIRONMENT_TREND_UPDATED_AT     "Environment.Trend.UpdatedAt"
+
 #endif // FENX_COMMON_CONSTANTS_MQH
 

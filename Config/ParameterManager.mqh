@@ -26,6 +26,17 @@ private:
    double m_range_break_buffer_atr_fraction;
    int    m_range_max_break_events;
    double m_range_score_threshold;
+   int    m_trend_lookback_bars;
+   int    m_trend_ma_period;
+   int    m_trend_slope_bars;
+   int    m_trend_adx_period;
+   double m_trend_min_adx;
+   double m_trend_min_slope_atr_fraction;
+   double m_trend_min_atr_movement;
+   double m_trend_noise_atr_fraction;
+   double m_trend_direction_score_threshold;
+   double m_trend_strength_threshold;
+   double m_trend_confidence_threshold;
 
 public:
                      CParameterManager(void)
@@ -59,6 +70,17 @@ public:
       m_range_break_buffer_atr_fraction=0.15;
       m_range_max_break_events=4;
       m_range_score_threshold=65.0;
+      m_trend_lookback_bars=30;
+      m_trend_ma_period=20;
+      m_trend_slope_bars=10;
+      m_trend_adx_period=14;
+      m_trend_min_adx=20.0;
+      m_trend_min_slope_atr_fraction=0.05;
+      m_trend_min_atr_movement=0.75;
+      m_trend_noise_atr_fraction=0.10;
+      m_trend_direction_score_threshold=20.0;
+      m_trend_strength_threshold=60.0;
+      m_trend_confidence_threshold=60.0;
      }
 
    int               UpdateIntervalSeconds(void)
@@ -139,6 +161,61 @@ public:
    double            RangeScoreThreshold(void)
      {
       return(m_range_score_threshold);
+     }
+
+   int               TrendLookbackBars(void)
+     {
+      return(m_trend_lookback_bars);
+     }
+
+   int               TrendMaPeriod(void)
+     {
+      return(m_trend_ma_period);
+     }
+
+   int               TrendSlopeBars(void)
+     {
+      return(m_trend_slope_bars);
+     }
+
+   int               TrendAdxPeriod(void)
+     {
+      return(m_trend_adx_period);
+     }
+
+   double            TrendMinAdx(void)
+     {
+      return(m_trend_min_adx);
+     }
+
+   double            TrendMinSlopeAtrFraction(void)
+     {
+      return(m_trend_min_slope_atr_fraction);
+     }
+
+   double            TrendMinAtrMovement(void)
+     {
+      return(m_trend_min_atr_movement);
+     }
+
+   double            TrendNoiseAtrFraction(void)
+     {
+      return(m_trend_noise_atr_fraction);
+     }
+
+   double            TrendDirectionScoreThreshold(void)
+     {
+      return(m_trend_direction_score_threshold);
+     }
+
+   double            TrendStrengthThreshold(void)
+     {
+      return(m_trend_strength_threshold);
+     }
+
+   double            TrendConfidenceThreshold(void)
+     {
+      return(m_trend_confidence_threshold);
      }
   };
 

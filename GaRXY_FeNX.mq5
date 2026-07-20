@@ -8,6 +8,7 @@
 
 #include "Core/CoreController.mqh"
 #include "Environment/RangeDetector.mqh"
+#include "Environment/TrendDetector.mqh"
 #include "Environment/VolatilityAnalyzer.mqh"
 
 //--- Framework-wide services
@@ -15,6 +16,7 @@ CParameterManager g_parameters;
 CCoreController   g_controller;
 CVolatilityAnalyzer g_volatility_analyzer;
 CRangeDetector      g_range_detector;
+CTrendDetector      g_trend_detector;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -36,6 +38,12 @@ int OnInit()
    if(!g_controller.RegisterEngine(g_range_detector))
      {
       CLogger::Error("Unable to register RangeDetector.");
+      return(INIT_FAILED);
+     }
+
+   if(!g_controller.RegisterEngine(g_trend_detector))
+     {
+      CLogger::Error("Unable to register TrendDetector.");
       return(INIT_FAILED);
      }
 
