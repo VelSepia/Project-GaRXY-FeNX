@@ -7,7 +7,7 @@
 //--- Framework identifiers and conservative Phase3-1 limits
 #define FENX_EA_NAME           "GaRXY FeNX"
 #define FENX_MAX_ENGINES       32
-#define FENX_DATABUS_CAPACITY  128
+#define FENX_DATABUS_CAPACITY  192
 #define FENX_MARKET_SELECTION_MAX_SYMBOLS 4
 #define FENX_PAIR_RANKING_COMPARE_EPSILON 0.0001
 
@@ -91,4 +91,19 @@
 #define FENX_DATABUS_KEY_CAPITAL_ALLOCATION_DATA_VALID          "CapitalAllocation.AllocationDataValid"
 #define FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UPDATED_AT          "CapitalAllocation.AllocationUpdatedAt"
 
+//--- Per-symbol Trading Style DataBus namespace and field names
+#define FENX_DATABUS_NAMESPACE_TRADING_STYLE                    "TradingStyle"
+#define FENX_DATABUS_FIELD_TRADING_STYLE                        "TradingStyle"
+#define FENX_DATABUS_FIELD_TRADING_STYLE_SCORE                  "TradingStyleScore"
+#define FENX_DATABUS_FIELD_TRADING_STYLE_CONFIDENCE             "TradingStyleConfidence"
+#define FENX_DATABUS_FIELD_TRADING_STYLE_REASON                 "TradingStyleReason"
+#define FENX_DATABUS_FIELD_TRADING_STYLE_UPDATED_AT             "TradingStyleUpdatedAt"
+#define FENX_DATABUS_FIELD_TRADING_STYLE_IS_VALID               "IsTradingStyleValid"
+
+//--- Global Trading Style DataBus keys
+#define FENX_DATABUS_KEY_TRADING_STYLE_ACTIVE_COUNT             "TradingStyle.ActiveTradingStyleCount"
+#define FENX_DATABUS_KEY_TRADING_STYLE_DATA_VALID               "TradingStyle.StyleDataValid"
+#define FENX_DATABUS_KEY_TRADING_STYLE_UPDATED_AT               "TradingStyle.TradingStyleUpdatedAt"
+
 #endif // FENX_COMMON_CONSTANTS_MQH
+

@@ -68,6 +68,13 @@ private:
    int    m_capital_allocation_stale_data_limit_seconds;
    double m_capital_allocation_volatility_penalty;
    double m_capital_allocation_transition_penalty;
+   double m_trading_style_trend_confidence_threshold;
+   double m_trading_style_range_confidence_threshold;
+   double m_trading_style_max_volatility_score;
+   double m_trading_style_transition_penalty;
+   int    m_trading_style_stale_data_limit_seconds;
+   double m_trading_style_stale_data_penalty;
+   double m_trading_style_min_allocation_percent;
 
 public:
                      CParameterManager(void)
@@ -143,6 +150,13 @@ public:
       m_capital_allocation_stale_data_limit_seconds=5;
       m_capital_allocation_volatility_penalty=40.0;
       m_capital_allocation_transition_penalty=30.0;
+      m_trading_style_trend_confidence_threshold=65.0;
+      m_trading_style_range_confidence_threshold=70.0;
+      m_trading_style_max_volatility_score=80.0;
+      m_trading_style_transition_penalty=30.0;
+      m_trading_style_stale_data_limit_seconds=5;
+      m_trading_style_stale_data_penalty=20.0;
+      m_trading_style_min_allocation_percent=5.0;
      }
 
    int               UpdateIntervalSeconds(void)
@@ -459,6 +473,42 @@ public:
      {
       return(m_capital_allocation_transition_penalty);
      }
+
+   double            TradingStyleTrendConfidenceThreshold(void)
+     {
+      return(m_trading_style_trend_confidence_threshold);
+     }
+
+   double            TradingStyleRangeConfidenceThreshold(void)
+     {
+      return(m_trading_style_range_confidence_threshold);
+     }
+
+   double            TradingStyleMaxVolatilityScore(void)
+     {
+      return(m_trading_style_max_volatility_score);
+     }
+
+   double            TradingStyleTransitionPenalty(void)
+     {
+      return(m_trading_style_transition_penalty);
+     }
+
+   int               TradingStyleStaleDataLimitSeconds(void)
+     {
+      return(m_trading_style_stale_data_limit_seconds);
+     }
+
+   double            TradingStyleStaleDataPenalty(void)
+     {
+      return(m_trading_style_stale_data_penalty);
+     }
+
+   double            TradingStyleMinAllocationPercent(void)
+     {
+      return(m_trading_style_min_allocation_percent);
+     }
   };
 
 #endif // FENX_CONFIG_PARAMETER_MANAGER_MQH
+

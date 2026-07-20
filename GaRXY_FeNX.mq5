@@ -14,6 +14,7 @@
 #include "MarketSelection/MarketSelectionEngine.mqh"
 #include "PairRanking/PairRankingEngine.mqh"
 #include "CapitalAllocation/CapitalAllocationEngine.mqh"
+#include "TradingStyle/TradingStyleEngine.mqh"
 
 //--- Framework-wide services
 CParameterManager g_parameters;
@@ -25,6 +26,7 @@ CMarketStateIntegrator g_market_state_integrator;
 CMarketSelectionEngine g_market_selection_engine;
 CPairRankingEngine     g_pair_ranking_engine;
 CCapitalAllocationEngine g_capital_allocation_engine;
+CTradingStyleEngine      g_trading_style_engine;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -79,6 +81,12 @@ int OnInit()
       return(INIT_FAILED);
      }
 
+   if(!g_controller.RegisterEngine(g_trading_style_engine))
+     {
+      CLogger::Error("Unable to register TradingStyleEngine.");
+      return(INIT_FAILED);
+     }
+
    if(!g_controller.Initialize(g_parameters))
       return(INIT_FAILED);
 
@@ -100,3 +108,4 @@ void OnTick()
   {
    g_controller.Update();
   }
+
