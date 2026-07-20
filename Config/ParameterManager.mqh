@@ -75,6 +75,15 @@ private:
    int    m_trading_style_stale_data_limit_seconds;
    double m_trading_style_stale_data_penalty;
    double m_trading_style_min_allocation_percent;
+   double m_strategy_selection_min_confidence;
+   double m_strategy_selection_min_allocation_percent;
+   double m_strategy_selection_min_ranking_score;
+   double m_strategy_selection_range_threshold;
+   double m_strategy_selection_trend_threshold;
+   double m_strategy_selection_breakout_volatility_threshold;
+   double m_strategy_selection_transition_penalty;
+   int    m_strategy_selection_stale_data_limit_seconds;
+   double m_strategy_selection_no_trade_safety_threshold;
 
 public:
                      CParameterManager(void)
@@ -157,6 +166,15 @@ public:
       m_trading_style_stale_data_limit_seconds=5;
       m_trading_style_stale_data_penalty=20.0;
       m_trading_style_min_allocation_percent=5.0;
+      m_strategy_selection_min_confidence=60.0;
+      m_strategy_selection_min_allocation_percent=5.0;
+      m_strategy_selection_min_ranking_score=60.0;
+      m_strategy_selection_range_threshold=70.0;
+      m_strategy_selection_trend_threshold=70.0;
+      m_strategy_selection_breakout_volatility_threshold=75.0;
+      m_strategy_selection_transition_penalty=10.0;
+      m_strategy_selection_stale_data_limit_seconds=5;
+      m_strategy_selection_no_trade_safety_threshold=40.0;
      }
 
    int               UpdateIntervalSeconds(void)
@@ -507,6 +525,51 @@ public:
    double            TradingStyleMinAllocationPercent(void)
      {
       return(m_trading_style_min_allocation_percent);
+     }
+
+   double            StrategySelectionMinConfidence(void)
+     {
+      return(m_strategy_selection_min_confidence);
+     }
+
+   double            StrategySelectionMinAllocationPercent(void)
+     {
+      return(m_strategy_selection_min_allocation_percent);
+     }
+
+   double            StrategySelectionMinRankingScore(void)
+     {
+      return(m_strategy_selection_min_ranking_score);
+     }
+
+   double            StrategySelectionRangeThreshold(void)
+     {
+      return(m_strategy_selection_range_threshold);
+     }
+
+   double            StrategySelectionTrendThreshold(void)
+     {
+      return(m_strategy_selection_trend_threshold);
+     }
+
+   double            StrategySelectionBreakoutVolatilityThreshold(void)
+     {
+      return(m_strategy_selection_breakout_volatility_threshold);
+     }
+
+   double            StrategySelectionTransitionPenalty(void)
+     {
+      return(m_strategy_selection_transition_penalty);
+     }
+
+   int               StrategySelectionStaleDataLimitSeconds(void)
+     {
+      return(m_strategy_selection_stale_data_limit_seconds);
+     }
+
+   double            StrategySelectionNoTradeSafetyThreshold(void)
+     {
+      return(m_strategy_selection_no_trade_safety_threshold);
      }
   };
 

@@ -15,6 +15,7 @@
 #include "PairRanking/PairRankingEngine.mqh"
 #include "CapitalAllocation/CapitalAllocationEngine.mqh"
 #include "TradingStyle/TradingStyleEngine.mqh"
+#include "Strategy/StrategySelectionEngine.mqh"
 
 //--- Framework-wide services
 CParameterManager g_parameters;
@@ -27,6 +28,7 @@ CMarketSelectionEngine g_market_selection_engine;
 CPairRankingEngine     g_pair_ranking_engine;
 CCapitalAllocationEngine g_capital_allocation_engine;
 CTradingStyleEngine      g_trading_style_engine;
+CStrategySelectionEngine g_strategy_selection_engine;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -84,6 +86,12 @@ int OnInit()
    if(!g_controller.RegisterEngine(g_trading_style_engine))
      {
       CLogger::Error("Unable to register TradingStyleEngine.");
+      return(INIT_FAILED);
+     }
+
+   if(!g_controller.RegisterEngine(g_strategy_selection_engine))
+     {
+      CLogger::Error("Unable to register StrategySelectionEngine.");
       return(INIT_FAILED);
      }
 

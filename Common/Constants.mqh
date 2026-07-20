@@ -105,5 +105,20 @@
 #define FENX_DATABUS_KEY_TRADING_STYLE_DATA_VALID               "TradingStyle.StyleDataValid"
 #define FENX_DATABUS_KEY_TRADING_STYLE_UPDATED_AT               "TradingStyle.TradingStyleUpdatedAt"
 
+//--- Per-symbol Strategy Selection DataBus namespace and field names
+#define FENX_DATABUS_NAMESPACE_STRATEGY_SELECTION                "StrategySelection"
+#define FENX_DATABUS_FIELD_SELECTED_STRATEGY                     "SelectedStrategy"
+#define FENX_DATABUS_FIELD_STRATEGY_SELECTION_SCORE              "StrategySelectionScore"
+#define FENX_DATABUS_FIELD_STRATEGY_SELECTION_CONFIDENCE         "StrategySelectionConfidence"
+#define FENX_DATABUS_FIELD_STRATEGY_SELECTION_REASON             "StrategySelectionReason"
+#define FENX_DATABUS_FIELD_STRATEGY_SELECTION_IS_VALID           "IsStrategySelectionValid"
+#define FENX_DATABUS_FIELD_STRATEGY_SELECTION_UPDATED_AT         "StrategySelectionUpdatedAt"
+
+//--- Global Strategy Selection DataBus keys
+#define FENX_DATABUS_KEY_STRATEGY_SELECTION_ACTIVE_COUNT         "StrategySelection.ActiveStrategyCount"
+#define FENX_DATABUS_KEY_STRATEGY_SELECTION_NO_TRADE_COUNT       "StrategySelection.NoTradeSymbolCount"
+#define FENX_DATABUS_KEY_STRATEGY_SELECTION_DATA_VALID           "StrategySelection.StrategySelectionDataValid"
+#define FENX_DATABUS_KEY_STRATEGY_SELECTION_UPDATED_AT           "StrategySelection.StrategySelectionUpdatedAt"
+
 #endif // FENX_COMMON_CONSTANTS_MQH
 
