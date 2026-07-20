@@ -35,7 +35,7 @@ public:
 
       m_state_manager.Reset();
 
-      // TODO: Register Environment, Risk, Strategy, and Data engines in future phases.
+      // TODO(Phase3-3+): Register additional engines as their dedicated phases begin.
       if(!m_engine_manager.Initialize(m_data_bus,parameters))
         {
          m_state_manager.TransitionTo(FENX_STATE_SHUTDOWN);
@@ -52,6 +52,17 @@ public:
       m_initialized=true;
       CLogger::Info("CoreController initialized.");
       return(true);
+     }
+
+   bool              RegisterEngine(IEngine &engine)
+     {
+      if(m_initialized)
+        {
+         CLogger::Warning("CoreController cannot register an engine after initialization.");
+         return(false);
+        }
+
+      return(m_engine_manager.Register(engine));
      }
 
    void              Update(void)

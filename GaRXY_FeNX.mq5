@@ -7,10 +7,12 @@
 #property strict
 
 #include "Core/CoreController.mqh"
+#include "Environment/VolatilityAnalyzer.mqh"
 
 //--- Framework-wide services
 CParameterManager g_parameters;
 CCoreController   g_controller;
+CVolatilityAnalyzer g_volatility_analyzer;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -20,6 +22,12 @@ int OnInit()
    if(!g_parameters.Load())
      {
       CLogger::Error("Unable to load framework parameters.");
+      return(INIT_FAILED);
+     }
+
+   if(!g_controller.RegisterEngine(g_volatility_analyzer))
+     {
+      CLogger::Error("Unable to register VolatilityAnalyzer.");
       return(INIT_FAILED);
      }
 

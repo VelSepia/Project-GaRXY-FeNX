@@ -9,5 +9,10 @@
 #define FENX_MAX_ENGINES       32
 #define FENX_DATABUS_CAPACITY  64
 
+//--- Environment Engine DataBus keys
+#define FENX_DATABUS_KEY_ENVIRONMENT_ATR               "Environment.Volatility.ATR"
+#define FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE  "Environment.Volatility.Score"
+#define FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_LEVEL  "Environment.Volatility.Level"
+
 #endif // FENX_COMMON_CONSTANTS_MQH
 
