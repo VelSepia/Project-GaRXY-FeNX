@@ -113,6 +113,7 @@ private:
    int    m_risk_transition_cooldown_seconds;
    double m_risk_caution_allocation_multiplier;
    double m_risk_reduced_allocation_multiplier;
+
    bool   m_execution_enabled;
    string m_execution_symbol;
    long   m_execution_magic_number;
@@ -321,7 +322,56 @@ public:
       m_execution_magic_number=93095;
       m_execution_fixed_lot=0.01;
       m_execution_maximum_spread_points=20.0;
-      m_execution_entry_boundary_dis„Õ≠¢Gß≤⁄Óù∆≠yŸ
+      m_execution_entry_boundary_distance_points=20.0;
+      m_execution_entry_boundary_distance_atr_ratio=0.15;
+      m_execution_exit_mode="RANGE_BASED";
+      m_execution_fixed_take_profit_points=30.0;
+      m_execution_fixed_stop_loss_points=30.0;
+      m_execution_range_stop_buffer_points=10.0;
+      m_execution_minimum_range_score=70.0;
+      m_execution_minimum_strategy_confidence=65.0;
+      m_execution_minimum_risk_confidence=60.0;
+      m_execution_order_cooldown_seconds=60;
+      m_execution_one_order_per_bar=true;
+      m_execution_maximum_open_positions_per_symbol=1;
+      m_execution_allow_buy=true;
+      m_execution_allow_sell=true;
+      m_execution_maximum_slippage_points=10;
+      m_execution_transient_retry_limit=1;
+      m_execution_trade_comment="GaRXY_FeNX_Core_v1";
+     }
+
+   int               UpdateIntervalSeconds(void)
+     {
+      return(m_update_interval_seconds);
+     }
+
+   bool              IsFrameworkLoggingEnabled(void)
+     {
+      return(m_framework_logging_enabled);
+     }
+
+   int               VolatilityAtrPeriod(void)
+     {
+      return(m_volatility_atr_period);
+     }
+
+   int               VolatilityBaselineSamples(void)
+     {
+      return(m_volatility_baseline_samples);
+     }
+
+   double            VolatilityLowScore(void)
+     {
+      return(m_volatility_low_score);
+     }
+
+   double            VolatilityHighScore(void)
+     {
+      return(m_volatility_high_score);
+     }
+
+   int               RangeLookbackBars(void)
      {
       return(m_range_lookback_bars);
      }
@@ -830,7 +880,6 @@ public:
      {
       return(m_risk_reduced_allocation_multiplier);
      }
-
    bool              ExecutionEnabled(void)
      {
       return(m_execution_enabled);
