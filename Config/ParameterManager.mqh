@@ -113,6 +113,28 @@ private:
    int    m_risk_transition_cooldown_seconds;
    double m_risk_caution_allocation_multiplier;
    double m_risk_reduced_allocation_multiplier;
+   bool   m_execution_enabled;
+   string m_execution_symbol;
+   long   m_execution_magic_number;
+   double m_execution_fixed_lot;
+   double m_execution_maximum_spread_points;
+   double m_execution_entry_boundary_distance_points;
+   double m_execution_entry_boundary_distance_atr_ratio;
+   string m_execution_exit_mode;
+   double m_execution_fixed_take_profit_points;
+   double m_execution_fixed_stop_loss_points;
+   double m_execution_range_stop_buffer_points;
+   double m_execution_minimum_range_score;
+   double m_execution_minimum_strategy_confidence;
+   double m_execution_minimum_risk_confidence;
+   int    m_execution_order_cooldown_seconds;
+   bool   m_execution_one_order_per_bar;
+   int    m_execution_maximum_open_positions_per_symbol;
+   bool   m_execution_allow_buy;
+   bool   m_execution_allow_sell;
+   int    m_execution_maximum_slippage_points;
+   int    m_execution_transient_retry_limit;
+   string m_execution_trade_comment;
 
 public:
                      CParameterManager(void)
@@ -125,6 +147,67 @@ public:
       // TODO: Read EA input parameters and external configuration in a later phase.
       Reset();
       CLogger::Info("ParameterManager loaded framework defaults.");
+      return(true);
+     }
+
+   //--- Applies the Expert Advisor inputs for the isolated Phase3-9.5 execution layer.
+   //--- Keeping this mapping here preserves ParameterManager as the single configuration owner.
+   bool              ConfigureExecution(const bool enabled,const string symbol,
+                                        const long magic_number,const double fixed_lot,
+                                        const double maximum_spread_points,
+                                        const double entry_boundary_distance_points,
+                                        const double entry_boundary_distance_atr_ratio,
+                                        const string exit_mode,
+                                        const double fixed_take_profit_points,
+                                        const double fixed_stop_loss_points,
+                                        const double range_stop_buffer_points,
+                                        const double minimum_range_score,
+                                        const double minimum_strategy_confidence,
+                                        const double minimum_risk_confidence,
+                                        const int order_cooldown_seconds,
+                                        const bool one_order_per_bar,
+                                        const int maximum_open_positions_per_symbol,
+                                        const bool allow_buy,const bool allow_sell,
+                                        const int maximum_slippage_points,
+                                        const int transient_retry_limit,
+                                        const string trade_comment)
+     {
+      if(StringLen(symbol)==0 || magic_number<=0 || fixed_lot<=0.0 ||
+         maximum_spread_points<=0.0 || entry_boundary_distance_points<0.0 ||
+         entry_boundary_distance_atr_ratio<0.0 ||
+         (exit_mode!="RANGE_BASED" && exit_mode!="FIXED_POINTS") ||
+         fixed_take_profit_points<=0.0 || fixed_stop_loss_points<=0.0 ||
+         range_stop_buffer_points<0.0 || minimum_range_score<0.0 ||
+         minimum_strategy_confidence<0.0 || minimum_risk_confidence<0.0 ||
+         order_cooldown_seconds<0 || maximum_open_positions_per_symbol<=0 ||
+         maximum_slippage_points<0 || transient_retry_limit<0 ||
+         StringLen(trade_comment)==0)
+        {
+         CLogger::Error("Execution parameter input is invalid.");
+         return(false);
+        }
+      m_execution_enabled=enabled;
+      m_execution_symbol=symbol;
+      m_execution_magic_number=magic_number;
+      m_execution_fixed_lot=fixed_lot;
+      m_execution_maximum_spread_points=maximum_spread_points;
+      m_execution_entry_boundary_distance_points=entry_boundary_distance_points;
+      m_execution_entry_boundary_distance_atr_ratio=entry_boundary_distance_atr_ratio;
+      m_execution_exit_mode=exit_mode;
+      m_execution_fixed_take_profit_points=fixed_take_profit_points;
+      m_execution_fixed_stop_loss_points=fixed_stop_loss_points;
+      m_execution_range_stop_buffer_points=range_stop_buffer_points;
+      m_execution_minimum_range_score=minimum_range_score;
+      m_execution_minimum_strategy_confidence=minimum_strategy_confidence;
+      m_execution_minimum_risk_confidence=minimum_risk_confidence;
+      m_execution_order_cooldown_seconds=order_cooldown_seconds;
+      m_execution_one_order_per_bar=one_order_per_bar;
+      m_execution_maximum_open_positions_per_symbol=maximum_open_positions_per_symbol;
+      m_execution_allow_buy=allow_buy;
+      m_execution_allow_sell=allow_sell;
+      m_execution_maximum_slippage_points=maximum_slippage_points;
+      m_execution_transient_retry_limit=transient_retry_limit;
+      m_execution_trade_comment=trade_comment;
       return(true);
      }
 
@@ -233,39 +316,12 @@ public:
       m_risk_transition_cooldown_seconds=30;
       m_risk_caution_allocation_multiplier=0.75;
       m_risk_reduced_allocation_multiplier=0.50;
-     }
-
-   int               UpdateIntervalSeconds(void)
-     {
-      return(m_update_interval_seconds);
-     }
-
-   bool              IsFrameworkLoggingEnabled(void)
-     {
-      return(m_framework_logging_enabled);
-     }
-
-   int               VolatilityAtrPeriod(void)
-     {
-      return(m_volatility_atr_period);
-     }
-
-   int               VolatilityBaselineSamples(void)
-     {
-      return(m_volatility_baseline_samples);
-     }
-
-   double            VolatilityLowScore(void)
-     {
-      return(m_volatility_low_score);
-     }
-
-   double            VolatilityHighScore(void)
-     {
-      return(m_volatility_high_score);
-     }
-
-   int               RangeLookbackBars(void)
+      m_execution_enabled=false;
+      m_execution_symbol="USDJPY";
+      m_execution_magic_number=93095;
+      m_execution_fixed_lot=0.01;
+      m_execution_maximum_spread_points=20.0;
+      m_execution_entry_boundary_disãÍ­¢G§²ÚîÆ­yÙ
      {
       return(m_range_lookback_bars);
      }
@@ -773,6 +829,116 @@ public:
    double            RiskReducedAllocationMultiplier(void)
      {
       return(m_risk_reduced_allocation_multiplier);
+     }
+
+   bool              ExecutionEnabled(void)
+     {
+      return(m_execution_enabled);
+     }
+
+   string            ExecutionSymbol(void)
+     {
+      return(m_execution_symbol);
+     }
+
+   long              ExecutionMagicNumber(void)
+     {
+      return(m_execution_magic_number);
+     }
+
+   double            ExecutionFixedLot(void)
+     {
+      return(m_execution_fixed_lot);
+     }
+
+   double            ExecutionMaximumSpreadPoints(void)
+     {
+      return(m_execution_maximum_spread_points);
+     }
+
+   double            ExecutionEntryBoundaryDistancePoints(void)
+     {
+      return(m_execution_entry_boundary_distance_points);
+     }
+
+   double            ExecutionEntryBoundaryDistanceAtrRatio(void)
+     {
+      return(m_execution_entry_boundary_distance_atr_ratio);
+     }
+
+   string            ExecutionExitMode(void)
+     {
+      return(m_execution_exit_mode);
+     }
+
+   double            ExecutionFixedTakeProfitPoints(void)
+     {
+      return(m_execution_fixed_take_profit_points);
+     }
+
+   double            ExecutionFixedStopLossPoints(void)
+     {
+      return(m_execution_fixed_stop_loss_points);
+     }
+
+   double            ExecutionRangeStopBufferPoints(void)
+     {
+      return(m_execution_range_stop_buffer_points);
+     }
+
+   double            ExecutionMinimumRangeScore(void)
+     {
+      return(m_execution_minimum_range_score);
+     }
+
+   double            ExecutionMinimumStrategyConfidence(void)
+     {
+      return(m_execution_minimum_strategy_confidence);
+     }
+
+   double            ExecutionMinimumRiskConfidence(void)
+     {
+      return(m_execution_minimum_risk_confidence);
+     }
+
+   int               ExecutionOrderCooldownSeconds(void)
+     {
+      return(m_execution_order_cooldown_seconds);
+     }
+
+   bool              ExecutionOneOrderPerBar(void)
+     {
+      return(m_execution_one_order_per_bar);
+     }
+
+   int               ExecutionMaximumOpenPositionsPerSymbol(void)
+     {
+      return(m_execution_maximum_open_positions_per_symbol);
+     }
+
+   bool              ExecutionAllowBuy(void)
+     {
+      return(m_execution_allow_buy);
+     }
+
+   bool              ExecutionAllowSell(void)
+     {
+      return(m_execution_allow_sell);
+     }
+
+   int               ExecutionMaximumSlippagePoints(void)
+     {
+      return(m_execution_maximum_slippage_points);
+     }
+
+   int               ExecutionTransientRetryLimit(void)
+     {
+      return(m_execution_transient_retry_limit);
+     }
+
+   string            ExecutionTradeComment(void)
+     {
+      return(m_execution_trade_comment);
      }
   };
 

@@ -18,6 +18,31 @@
 #include "Strategy/StrategySelectionEngine.mqh"
 #include "Standby/StandbyEngine.mqh"
 #include "Risk/RiskEngine.mqh"
+#include "Execution/ExecutionEngine.mqh"
+
+//--- Phase3-9.5 execution inputs. Execution remains opt-in for tester safety.
+input bool   InpExecutionEnabled                    = false;
+input string InpExecutionSymbol                     = "USDJPY";
+input long   InpExecutionMagicNumber                = 93095;
+input double InpExecutionFixedLot                   = 0.01;
+input double InpExecutionMaximumSpreadPoints        = 20.0;
+input double InpExecutionEntryBoundaryDistancePoints= 20.0;
+input double InpExecutionEntryBoundaryDistanceAtrRatio = 0.15;
+input string InpExecutionExitMode                   = "RANGE_BASED";
+input double InpExecutionFixedTakeProfitPoints      = 30.0;
+input double InpExecutionFixedStopLossPoints        = 30.0;
+input double InpExecutionRangeStopBufferPoints      = 10.0;
+input double InpExecutionMinimumRangeScore          = 70.0;
+input double InpExecutionMinimumStrategyConfidence  = 65.0;
+input double InpExecutionMinimumRiskConfidence      = 60.0;
+input int    InpExecutionOrderCooldownSeconds       = 60;
+input bool   InpExecutionOneOrderPerBar             = true;
+input int    InpExecutionMaximumOpenPositionsPerSymbol = 1;
+input bool   InpExecutionAllowBuy                   = true;
+input bool   InpExecutionAllowSell                  = true;
+input int    InpExecutionMaximumSlippagePoints      = 10;
+input int    InpExecutionTransientRetryLimit        = 1;
+input string InpExecutionTradeComment               = "GaRXY_FeNX_Core_v1";
 
 //--- Framework-wide services
 CParameterManager g_parameters;
@@ -33,6 +58,7 @@ CTradingStyleEngine      g_trading_style_engine;
 CStrategySelectionEngine g_strategy_selection_engine;
 CStandbyEngine           g_standby_engine;
 CRiskEngine              g_risk_engine;
+CExecutionEngine         g_execution_engine;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -42,6 +68,28 @@ int OnInit()
    if(!g_parameters.Load())
      {
       CLogger::Error("Unable to load framework parameters.");
+      return(INIT_FAILED);
+     }
+   if(!g_parameters.ConfigureExecution(InpExecutionEnabled,InpExecutionSymbol,
+                                       InpExecutionMagicNumber,InpExecutionFixedLot,
+                                       InpExecutionMaximumSpreadPoints,
+                                       InpExecutionEntryBoundaryDistancePoints,
+                                       InpExecutionEntryBoundaryDistanceAtrRatio,
+                                       InpExecutionExitMode,InpExecutionFixedTakeProfitPoints,
+                                       InpExecutionFixedStopLossPoints,
+                                       InpExecutionRangeStopBufferPoints,
+                                       InpExecutionMinimumRangeScore,
+                                       InpExecutionMinimumStrategyConfidence,
+                                       InpExecutionMinimumRiskConfidence,
+                                       InpExecutionOrderCooldownSeconds,
+                                       InpExecutionOneOrderPerBar,
+                                       InpExecutionMaximumOpenPositionsPerSymbol,
+                                       InpExecutionAllowBuy,InpExecutionAllowSell,
+                                       InpExecutionMaximumSlippagePoints,
+                                       InpExecutionTransientRetryLimit,
+                                       InpExecutionTradeComment))
+     {
+      CLogger::Error("Unable to configure minimal execution parameters.");
       return(INIT_FAILED);
      }
 
@@ -108,6 +156,12 @@ int OnInit()
    if(!g_controller.RegisterEngine(g_risk_engine))
      {
       CLogger::Error("Unable to register RiskEngine.");
+      return(INIT_FAILED);
+     }
+
+   if(!g_controller.RegisterEngine(g_execution_engine))
+     {
+      CLogger::Error("Unable to register ExecutionEngine.");
       return(INIT_FAILED);
      }
 

@@ -70,9 +70,10 @@ Implement phases in order unless a documented architecture decision explicitly c
 7. Phase3-7 — Strategy Selection Engine
 8. Phase3-8 — Standby Engine
 9. Phase3-9 — Risk Engine
-10. Phase3-10 — Priority Decision Engine
-11. Phase3-11 — Backtest
-12. Phase3-12 — Forward Test
+10. Phase3-9.5 — Minimal Trading Execution System
+11. Phase3-10 — Priority Decision Engine and initial backtest preparation
+12. Phase3-11 — Backtest
+13. Phase3-12 — Forward Test
 
 Each phase must preserve the previous framework contracts, introduce only its assigned responsibility, and remain independently testable.
 

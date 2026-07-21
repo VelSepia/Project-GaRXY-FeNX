@@ -7,7 +7,7 @@
 //--- Framework identifiers and conservative Phase3-1 limits
 #define FENX_EA_NAME           "GaRXY FeNX"
 #define FENX_MAX_ENGINES       32
-#define FENX_DATABUS_CAPACITY  320
+#define FENX_DATABUS_CAPACITY  336
 #define FENX_MARKET_SELECTION_MAX_SYMBOLS 4
 #define FENX_PAIR_RANKING_COMPARE_EPSILON 0.0001
 
@@ -173,5 +173,36 @@
 #define FENX_DATABUS_KEY_RISK_SYSTEM_REASON                        "Risk.SystemRiskReason"
 #define FENX_DATABUS_KEY_RISK_SYSTEM_DATA_VALID                    "Risk.SystemRiskDataValid"
 #define FENX_DATABUS_KEY_RISK_SYSTEM_UPDATED_AT                    "Risk.SystemRiskUpdatedAt"
+
+//--- Per-symbol Minimal Execution System DataBus namespace and field names
+#define FENX_DATABUS_NAMESPACE_EXECUTION                           "Execution"
+#define FENX_DATABUS_FIELD_EXECUTION_GATE_ALLOWED                  "ExecutionGateAllowed"
+#define FENX_DATABUS_FIELD_EXECUTION_GATE_REASON                   "ExecutionGateReason"
+#define FENX_DATABUS_FIELD_ENTRY_SIGNAL                            "EntrySignal"
+#define FENX_DATABUS_FIELD_ENTRY_SIGNAL_SCORE                      "EntrySignalScore"
+#define FENX_DATABUS_FIELD_ENTRY_SIGNAL_CONFIDENCE                 "EntrySignalConfidence"
+#define FENX_DATABUS_FIELD_REQUESTED_DIRECTION                     "RequestedDirection"
+#define FENX_DATABUS_FIELD_REQUESTED_VOLUME                        "RequestedVolume"
+#define FENX_DATABUS_FIELD_REQUESTED_ENTRY_PRICE                   "RequestedEntryPrice"
+#define FENX_DATABUS_FIELD_REQUESTED_STOP_LOSS                     "RequestedStopLoss"
+#define FENX_DATABUS_FIELD_REQUESTED_TAKE_PROFIT                   "RequestedTakeProfit"
+#define FENX_DATABUS_FIELD_DUPLICATE_ORDER_BLOCKED                 "DuplicateOrderBlocked"
+#define FENX_DATABUS_FIELD_EXISTING_POSITION_DETECTED              "ExistingPositionDetected"
+#define FENX_DATABUS_FIELD_LAST_ORDER_REQUEST_AT                   "LastOrderRequestAt"
+#define FENX_DATABUS_FIELD_LAST_EXECUTION_RESULT                   "LastExecutionResult"
+#define FENX_DATABUS_FIELD_LAST_EXECUTION_RETCODE                  "LastExecutionRetcode"
+#define FENX_DATABUS_FIELD_LAST_EXECUTION_DEAL_TICKET               "LastExecutionDealTicket"
+#define FENX_DATABUS_FIELD_EXECUTION_DATA_VALID                    "ExecutionDataValid"
+#define FENX_DATABUS_FIELD_EXECUTION_UPDATED_AT                    "ExecutionUpdatedAt"
+
+//--- Global Minimal Execution System DataBus keys
+#define FENX_DATABUS_KEY_EXECUTION_SYSTEM_ENABLED                  "Execution.SystemEnabled"
+#define FENX_DATABUS_KEY_EXECUTION_SYSTEM_READY                    "Execution.SystemReady"
+#define FENX_DATABUS_KEY_EXECUTION_SYSTEM_VALID                    "Execution.SystemValid"
+#define FENX_DATABUS_KEY_EXECUTION_OPEN_POSITION_COUNT             "Execution.OpenFeNXPositionCount"
+#define FENX_DATABUS_KEY_EXECUTION_SUCCESSFUL_ORDER_COUNT          "Execution.SuccessfulOrderCount"
+#define FENX_DATABUS_KEY_EXECUTION_FAILED_ORDER_COUNT              "Execution.FailedOrderCount"
+#define FENX_DATABUS_KEY_EXECUTION_BLOCKED_ORDER_COUNT             "Execution.BlockedOrderCount"
+#define FENX_DATABUS_KEY_EXECUTION_LAST_GLOBAL_AT                  "Execution.LastGlobalExecutionAt"
 
 #endif // FENX_COMMON_CONSTANTS_MQH
