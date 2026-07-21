@@ -161,26 +161,44 @@ private:
       if(m_data_bus==NULL)
          return(false);
 
+      double atr=0.0;
+      double volatility_score=0.0;
+      double range_score=0.0;
+      double trend_score=0.0;
+      double market_confidence=0.0;
+      bool is_range=false;
+      bool is_trend=false;
+      bool range_data_valid=false;
+      bool trend_data_valid=false;
+      string market_state="";
       string updated_at_text="";
-      if(!ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_ATR,environment.atr) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE,
-                     environment.volatility_score) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_SCORE,environment.range_score) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_SCORE,environment.trend_score) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_CONFIDENCE,
-                     environment.market_confidence) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_IS_RANGE,environment.is_range) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_IS_TREND,environment.is_trend) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,
-                      environment.range_data_valid) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID,
-                      environment.trend_data_valid) ||
-         !m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_STATE,
-                                environment.market_state) ||
+      datetime updated_at=0;
+      if(!ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_ATR,atr) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE,volatility_score) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_SCORE,range_score) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_SCORE,trend_score) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_CONFIDENCE,market_confidence) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_IS_RANGE,is_range) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_IS_TREND,is_trend) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,range_data_valid) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID,trend_data_valid) ||
+         !m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_STATE,market_state) ||
          !m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_UPDATED_AT,
                                 updated_at_text) ||
-         !ReadTimestampText(updated_at_text,environment.updated_at))
+         !ReadTimestampText(updated_at_text,updated_at))
          return(false);
+
+      environment.atr=atr;
+      environment.volatility_score=volatility_score;
+      environment.range_score=range_score;
+      environment.trend_score=trend_score;
+      environment.market_confidence=market_confidence;
+      environment.is_range=is_range;
+      environment.is_trend=is_trend;
+      environment.range_data_valid=range_data_valid;
+      environment.trend_data_valid=trend_data_valid;
+      environment.market_state=market_state;
+      environment.updated_at=updated_at;
 
       if(environment.atr<=0.0 || environment.volatility_score<0.0 ||
          environment.volatility_score>100.0 || environment.range_score<0.0 ||
@@ -193,48 +211,56 @@ private:
              environment.market_state=="VOLATILE" || environment.market_state=="TRANSITION");
      }
 
-   bool ReadSelectionInput(const string symbol,SSelectionRankingInput &input)
+   bool ReadSelectionInput(const string symbol,SSelectionRankingInput &source)
      {
       if(m_data_bus==NULL)
          return(false);
 
+      string input_symbol="";
       string text="";
+      string rejection_reason="";
       string updated_at_text="";
+      bool is_market_eligible=false;
+      datetime updated_at=0;
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
-                                      FENX_DATABUS_FIELD_MARKET_SELECTION_SYMBOL,input.symbol) ||
-         input.symbol!=symbol ||
+                                      FENX_DATABUS_FIELD_MARKET_SELECTION_SYMBOL,input_symbol) ||
+         input_symbol!=symbol ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_MARKET_SELECTION_IS_ELIGIBLE,text) ||
-         !ReadBooleanText(text,input.is_market_eligible) ||
+         !ReadBooleanText(text,is_market_eligible) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_MARKET_SELECTION_SCORE,text))
          return(false);
 
-      input.selection_score=StringToDouble(text);
+      source.symbol=input_symbol;
+      source.is_market_eligible=is_market_eligible;
+      source.selection_score=StringToDouble(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_MARKET_SELECTION_CONFIDENCE,text))
          return(false);
-      input.selection_confidence=StringToDouble(text);
+      source.selection_confidence=StringToDouble(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_MARKET_SELECTION_SPREAD_POINTS,text))
          return(false);
-      input.spread_points=StringToDouble(text);
+      source.spread_points=StringToDouble(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_MARKET_SELECTION_SPREAD_ATR,text))
          return(false);
-      input.spread_to_atr_ratio=StringToDouble(text);
+      source.spread_to_atr_ratio=StringToDouble(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_MARKET_SELECTION_REJECTION,
-                                      input.rejection_reason) ||
+                                      rejection_reason) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_MARKET_SELECTION_UPDATED_AT,
                                       updated_at_text) ||
-         !ReadTimestampText(updated_at_text,input.updated_at))
+         !ReadTimestampText(updated_at_text,updated_at))
          return(false);
 
-      return(input.selection_score>=0.0 && input.selection_score<=100.0 &&
-             input.selection_confidence>=0.0 && input.selection_confidence<=100.0 &&
-             input.spread_points>=0.0 && input.spread_to_atr_ratio>=0.0);
+      source.rejection_reason=rejection_reason;
+      source.updated_at=updated_at;
+      return(source.selection_score>=0.0 && source.selection_score<=100.0 &&
+             source.selection_confidence>=0.0 && source.selection_confidence<=100.0 &&
+             source.spread_points>=0.0 && source.spread_to_atr_ratio>=0.0);
      }
 
    bool CalculateFreshness(const datetime updated_at,double &freshness_score)
@@ -250,15 +276,15 @@ private:
       return(true);
      }
 
-   double CalculateSpreadEfficiency(const SSelectionRankingInput &input)
+   double CalculateSpreadEfficiency(const SSelectionRankingInput &source)
      {
       if(m_max_spread_points<=0.0 || m_max_spread_to_atr_ratio<=0.0)
          return(0.0);
 
       // Point and ATR-relative spread are combined once as one spread-efficiency factor.
-      const double point_score=ClampScore(100.0*(1.0-(input.spread_points/m_max_spread_points)));
+      const double point_score=ClampScore(100.0*(1.0-(source.spread_points/m_max_spread_points)));
       const double atr_score=ClampScore(100.0*(1.0-
-                                    (input.spread_to_atr_ratio/m_max_spread_to_atr_ratio)));
+                                    (source.spread_to_atr_ratio/m_max_spread_to_atr_ratio)));
       return((point_score+atr_score)/2.0);
      }
 
@@ -289,21 +315,21 @@ private:
       return(0.0);
      }
 
-   void BuildRankedSnapshot(const SSelectionRankingInput &input,
+   void BuildRankedSnapshot(const SSelectionRankingInput &source,
                             const SRankingEnvironment &environment,
                             const double freshness_score,SPairRankingSnapshot &snapshot)
      {
-      const double spread_efficiency=CalculateSpreadEfficiency(input);
+      const double spread_efficiency=CalculateSpreadEfficiency(source);
       const double volatility_suitability=CalculateVolatilitySuitability(environment.volatility_score);
       const double regime_suitability=CalculateRegimeSuitability(environment);
-      snapshot.score=ClampScore((m_weight_selection_score*input.selection_score)+
-                                (m_weight_selection_confidence*input.selection_confidence)+
+      snapshot.score=ClampScore((m_weight_selection_score*source.selection_score)+
+                                (m_weight_selection_confidence*source.selection_confidence)+
                                 (m_weight_spread_efficiency*spread_efficiency)+
                                 (m_weight_environment_confidence*environment.market_confidence)+
                                 (m_weight_volatility_suitability*volatility_suitability)+
                                 (m_weight_regime_suitability*regime_suitability)+
                                 (m_weight_freshness*freshness_score));
-      snapshot.confidence=ClampScore((0.40*input.selection_confidence)+
+      snapshot.confidence=ClampScore((0.40*source.selection_confidence)+
                                      (0.35*environment.market_confidence)+
                                      (0.25*freshness_score));
       snapshot.is_ranked=true;
@@ -430,8 +456,13 @@ private:
 
       for(int index=0;index<symbol_count;index++)
         {
-         if(!parameters.TryGetMarketSelectionSymbol(index,m_symbols[index]))
+         string configured_symbol="";
+
+         if(!parameters.TryGetMarketSelectionSymbol(index,configured_symbol))
+
             return(false);
+
+         m_symbols[index]=configured_symbol;
         }
 
       return(true);

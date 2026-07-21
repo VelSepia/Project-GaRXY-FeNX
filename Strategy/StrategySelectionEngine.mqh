@@ -170,29 +170,44 @@ private:
       if(m_data_bus==NULL)
          return(false);
 
+      string market_state="";
+      double range_score=0.0;
+      double trend_score=0.0;
+      double volatility_score=0.0;
+      bool range_data_valid=false;
+      bool trend_data_valid=false;
       string market_updated_at_text="";
       string range_updated_at_text="";
       string trend_updated_at_text="";
-      if(!m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_STATE,
-                                environment.market_state) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_SCORE,environment.range_score) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_SCORE,environment.trend_score) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE,
-                     environment.volatility_score) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,
-                      environment.range_data_valid) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID,
-                      environment.trend_data_valid) ||
+      datetime market_updated_at=0;
+      datetime range_updated_at=0;
+      datetime trend_updated_at=0;
+      if(!m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_STATE,market_state) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_SCORE,range_score) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_SCORE,trend_score) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE,volatility_score) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,range_data_valid) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID,trend_data_valid) ||
          !m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_UPDATED_AT,
                                 market_updated_at_text) ||
          !m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_UPDATED_AT,
                                 range_updated_at_text) ||
          !m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_TREND_UPDATED_AT,
                                 trend_updated_at_text) ||
-         !ReadTimestampText(market_updated_at_text,environment.market_updated_at) ||
-         !ReadTimestampText(range_updated_at_text,environment.range_updated_at) ||
-         !ReadTimestampText(trend_updated_at_text,environment.trend_updated_at))
+         !ReadTimestampText(market_updated_at_text,market_updated_at) ||
+         !ReadTimestampText(range_updated_at_text,range_updated_at) ||
+         !ReadTimestampText(trend_updated_at_text,trend_updated_at))
          return(false);
+
+      environment.market_state=market_state;
+      environment.range_score=range_score;
+      environment.trend_score=trend_score;
+      environment.volatility_score=volatility_score;
+      environment.range_data_valid=range_data_valid;
+      environment.trend_data_valid=trend_data_valid;
+      environment.market_updated_at=market_updated_at;
+      environment.range_updated_at=range_updated_at;
+      environment.trend_updated_at=trend_updated_at;
 
       if(environment.range_score<0.0 || environment.range_score>100.0 ||
          environment.trend_score<0.0 || environment.trend_score>100.0 ||
@@ -209,10 +224,17 @@ private:
       if(m_data_bus==NULL)
          return(false);
 
+      bool data_valid=false;
       string updated_at_text="";
-      return(ReadBoolean(FENX_DATABUS_KEY_PAIR_RANKING_DATA_VALID,ranking.data_valid) &&
-             m_data_bus.TryGetText(FENX_DATABUS_KEY_PAIR_RANKING_UPDATED_AT,updated_at_text) &&
-             ReadTimestampText(updated_at_text,ranking.updated_at));
+      datetime updated_at=0;
+      if(!ReadBoolean(FENX_DATABUS_KEY_PAIR_RANKING_DATA_VALID,data_valid) ||
+         !m_data_bus.TryGetText(FENX_DATABUS_KEY_PAIR_RANKING_UPDATED_AT,updated_at_text) ||
+         !ReadTimestampText(updated_at_text,updated_at))
+         return(false);
+
+      ranking.data_valid=data_valid;
+      ranking.updated_at=updated_at;
+      return(true);
      }
 
    bool ReadAllocationGlobal(SStrategySelectionAllocationGlobal &allocation)
@@ -220,12 +242,18 @@ private:
       if(m_data_bus==NULL)
          return(false);
 
+      bool data_valid=false;
       string updated_at_text="";
-      return(ReadBoolean(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_DATA_VALID,
-                         allocation.data_valid) &&
-             m_data_bus.TryGetText(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UPDATED_AT,
-                                   updated_at_text) &&
-             ReadTimestampText(updated_at_text,allocation.updated_at));
+      datetime updated_at=0;
+      if(!ReadBoolean(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_DATA_VALID,data_valid) ||
+         !m_data_bus.TryGetText(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UPDATED_AT,
+                                updated_at_text) ||
+         !ReadTimestampText(updated_at_text,updated_at))
+         return(false);
+
+      allocation.data_valid=data_valid;
+      allocation.updated_at=updated_at;
+      return(true);
      }
 
    bool ReadStyleGlobal(SStrategySelectionStyleGlobal &style)
@@ -233,72 +261,93 @@ private:
       if(m_data_bus==NULL)
          return(false);
 
+      bool data_valid=false;
       string updated_at_text="";
-      return(ReadBoolean(FENX_DATABUS_KEY_TRADING_STYLE_DATA_VALID,style.data_valid) &&
-             m_data_bus.TryGetText(FENX_DATABUS_KEY_TRADING_STYLE_UPDATED_AT,
-                                   updated_at_text) &&
-             ReadTimestampText(updated_at_text,style.updated_at));
+      datetime updated_at=0;
+      if(!ReadBoolean(FENX_DATABUS_KEY_TRADING_STYLE_DATA_VALID,data_valid) ||
+         !m_data_bus.TryGetText(FENX_DATABUS_KEY_TRADING_STYLE_UPDATED_AT,
+                                updated_at_text) ||
+         !ReadTimestampText(updated_at_text,updated_at))
+         return(false);
+
+      style.data_valid=data_valid;
+      style.updated_at=updated_at;
+      return(true);
      }
 
-   bool ReadSymbolInput(const string symbol,SStrategySelectionInput &input)
+   bool ReadSymbolInput(const string symbol,SStrategySelectionInput &source)
      {
       if(m_data_bus==NULL)
          return(false);
 
+      string trading_style="";
       string text="";
       string style_updated_at_text="";
       string pair_updated_at_text="";
       string allocation_updated_at_text="";
+      bool is_trading_style_valid=false;
+      bool is_pair_ranked=false;
+      bool is_capital_allocated=false;
+      datetime trading_style_updated_at=0;
+      datetime pair_ranking_updated_at=0;
+      datetime allocation_updated_at=0;
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
-                                      FENX_DATABUS_FIELD_TRADING_STYLE,input.trading_style) ||
+                                      FENX_DATABUS_FIELD_TRADING_STYLE,trading_style) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
                                       FENX_DATABUS_FIELD_TRADING_STYLE_SCORE,text))
          return(false);
 
-      input.trading_style_score=StringToDouble(text);
+      source.trading_style=trading_style;
+      source.trading_style_score=StringToDouble(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
                                       FENX_DATABUS_FIELD_TRADING_STYLE_CONFIDENCE,text))
          return(false);
-      input.trading_style_confidence=StringToDouble(text);
+      source.trading_style_confidence=StringToDouble(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
                                       FENX_DATABUS_FIELD_TRADING_STYLE_IS_VALID,text) ||
-         !ReadBooleanText(text,input.is_trading_style_valid) ||
+         !ReadBooleanText(text,is_trading_style_valid) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
                                       FENX_DATABUS_FIELD_TRADING_STYLE_UPDATED_AT,
                                       style_updated_at_text) ||
-         !ReadTimestampText(style_updated_at_text,input.trading_style_updated_at) ||
+         !ReadTimestampText(style_updated_at_text,trading_style_updated_at) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                                       FENX_DATABUS_FIELD_PAIR_RANKING_IS_RANKED,text) ||
-         !ReadBooleanText(text,input.is_pair_ranked) ||
+         !ReadBooleanText(text,is_pair_ranked) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                                       FENX_DATABUS_FIELD_PAIR_RANKING_SCORE,text))
          return(false);
 
-      input.pair_ranking_score=StringToDouble(text);
+      source.is_trading_style_valid=is_trading_style_valid;
+      source.trading_style_updated_at=trading_style_updated_at;
+      source.is_pair_ranked=is_pair_ranked;
+      source.pair_ranking_score=StringToDouble(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                                       FENX_DATABUS_FIELD_PAIR_RANKING_UPDATED_AT,
                                       pair_updated_at_text) ||
-         !ReadTimestampText(pair_updated_at_text,input.pair_ranking_updated_at) ||
+         !ReadTimestampText(pair_updated_at_text,pair_ranking_updated_at) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_CAPITAL_ALLOCATION,symbol,
                                       FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_IS_ALLOCATED,text) ||
-         !ReadBooleanText(text,input.is_capital_allocated) ||
+         !ReadBooleanText(text,is_capital_allocated) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_CAPITAL_ALLOCATION,symbol,
                                       FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_PERCENT,text))
          return(false);
 
-      input.allocation_percent=StringToDouble(text);
+      source.pair_ranking_updated_at=pair_ranking_updated_at;
+      source.is_capital_allocated=is_capital_allocated;
+      source.allocation_percent=StringToDouble(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_CAPITAL_ALLOCATION,symbol,
                                       FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_UPDATED_AT,
                                       allocation_updated_at_text) ||
-         !ReadTimestampText(allocation_updated_at_text,input.allocation_updated_at))
+         !ReadTimestampText(allocation_updated_at_text,allocation_updated_at))
          return(false);
 
-      return((input.trading_style=="RANGE" || input.trading_style=="TREND" ||
-              input.trading_style=="HYBRID" || input.trading_style=="STANDBY") &&
-             input.trading_style_score>=0.0 && input.trading_style_score<=100.0 &&
-             input.trading_style_confidence>=0.0 && input.trading_style_confidence<=100.0 &&
-             input.pair_ranking_score>=0.0 && input.pair_ranking_score<=100.0 &&
-             input.allocation_percent>=0.0 && input.allocation_percent<=100.0);
+      source.allocation_updated_at=allocation_updated_at;
+      return((source.trading_style=="RANGE" || source.trading_style=="TREND" ||
+              source.trading_style=="HYBRID" || source.trading_style=="STANDBY") &&
+             source.trading_style_score>=0.0 && source.trading_style_score<=100.0 &&
+             source.trading_style_confidence>=0.0 && source.trading_style_confidence<=100.0 &&
+             source.pair_ranking_score>=0.0 && source.pair_ranking_score<=100.0 &&
+             source.allocation_percent>=0.0 && source.allocation_percent<=100.0);
      }
 
    bool CalculateFreshness(const datetime updated_at,double &freshness)
@@ -315,10 +364,10 @@ private:
      }
 
    double CalculateSelectionConfidence(const SStrategySelectionEnvironment &environment,
-                                       const SStrategySelectionInput &input,
+                                       const SStrategySelectionInput &source,
                                        const double freshness)
      {
-      double confidence=input.trading_style_confidence*(freshness/100.0);
+      double confidence=source.trading_style_confidence*(freshness/100.0);
       if(environment.market_state=="TRANSITION")
          confidence-=m_transition_penalty;
 
@@ -326,32 +375,32 @@ private:
      }
 
    double CalculateSelectionScore(const double signal_score,
-                                  const SStrategySelectionInput &input,
+                                  const SStrategySelectionInput &source,
                                   const double selection_confidence)
      {
-      return(ClampPercent((0.40*signal_score)+(0.25*input.trading_style_score)+
-                          (0.20*input.pair_ranking_score)+(0.15*selection_confidence)));
+      return(ClampPercent((0.40*signal_score)+(0.25*source.trading_style_score)+
+                          (0.20*source.pair_ranking_score)+(0.15*selection_confidence)));
      }
 
    bool IsUnsafe(const SStrategySelectionEnvironment &environment,
-                 const SStrategySelectionInput &input,string &reason)
+                 const SStrategySelectionInput &source,string &reason)
      {
-      if(!input.is_trading_style_valid)
+      if(!source.is_trading_style_valid)
         {
          reason="Trading Style data is invalid.";
          return(true);
         }
-      if(input.trading_style=="STANDBY")
+      if(source.trading_style=="STANDBY")
         {
          reason="Trading Style recommends STANDBY.";
          return(true);
         }
-      if(!input.is_pair_ranked || input.pair_ranking_score<m_min_ranking_score)
+      if(!source.is_pair_ranked || source.pair_ranking_score<m_min_ranking_score)
         {
          reason="Pair Ranking score is below the strategy threshold.";
          return(true);
         }
-      if(!input.is_capital_allocated || input.allocation_percent<m_min_allocation_percent)
+      if(!source.is_capital_allocated || source.allocation_percent<m_min_allocation_percent)
         {
          reason="Capital allocation is below the strategy threshold.";
          return(true);
@@ -366,26 +415,26 @@ private:
      }
 
    void DecideStrategy(const SStrategySelectionEnvironment &environment,
-                       const SStrategySelectionInput &input,const double freshness,
+                       const SStrategySelectionInput &source,const double freshness,
                        SStrategySelectionSnapshot &snapshot)
      {
       string unsafe_reason="";
-      if(IsUnsafe(environment,input,unsafe_reason))
+      if(IsUnsafe(environment,source,unsafe_reason))
         {
          snapshot.reason=unsafe_reason;
          snapshot.is_valid=true;
          return;
         }
 
-      if(input.trading_style_confidence<m_min_confidence)
+      if(source.trading_style_confidence<m_min_confidence)
         {
          snapshot.reason="Trading Style confidence is below the strategy threshold.";
-         snapshot.confidence=input.trading_style_confidence;
+         snapshot.confidence=source.trading_style_confidence;
          snapshot.is_valid=true;
          return;
         }
 
-      const double confidence=CalculateSelectionConfidence(environment,input,freshness);
+      const double confidence=CalculateSelectionConfidence(environment,source,freshness);
       if(confidence<m_no_trade_safety_threshold)
         {
          snapshot.reason="Post-penalty strategy confidence is below the NO_TRADE safety threshold.";
@@ -395,21 +444,21 @@ private:
         }
 
       const bool directional_breakout=(environment.market_state=="TRENDING" &&
-                                       input.trading_style=="TREND" &&
+                                       source.trading_style=="TREND" &&
                                        environment.trend_score>=m_trend_threshold);
       const bool transition_breakout=(environment.market_state=="TRANSITION" &&
-                                      input.trading_style=="HYBRID" &&
+                                      source.trading_style=="HYBRID" &&
                                       environment.trend_score>=0.70*m_trend_threshold &&
                                       environment.range_score>=0.70*m_range_threshold);
       const bool breakout_ready=(environment.volatility_score>=m_breakout_volatility_threshold &&
                                  (directional_breakout || transition_breakout));
-      const bool range_ready=(input.trading_style=="RANGE" &&
+      const bool range_ready=(source.trading_style=="RANGE" &&
                               environment.market_state=="RANGING" &&
                               environment.range_score>=m_range_threshold);
-      const bool trend_ready=(input.trading_style=="TREND" &&
+      const bool trend_ready=(source.trading_style=="TREND" &&
                               environment.market_state=="TRENDING" &&
                               environment.trend_score>=m_trend_threshold);
-      const bool hybrid_ready=(input.trading_style=="HYBRID" &&
+      const bool hybrid_ready=(source.trading_style=="HYBRID" &&
                                environment.market_state=="TRANSITION" &&
                                environment.range_score>=0.70*m_range_threshold &&
                                environment.trend_score>=0.70*m_trend_threshold);
@@ -419,21 +468,21 @@ private:
       if(breakout_ready)
         {
          snapshot.selected_strategy="BREAKOUT";
-         snapshot.score=CalculateSelectionScore(environment.volatility_score,input,confidence);
+         snapshot.score=CalculateSelectionScore(environment.volatility_score,source,confidence);
          snapshot.reason="Strong volatility supports a directional or transition breakout mapping.";
          return;
         }
       if(range_ready)
         {
          snapshot.selected_strategy="RANGE_MEAN_REVERSION";
-         snapshot.score=CalculateSelectionScore(environment.range_score,input,confidence);
+         snapshot.score=CalculateSelectionScore(environment.range_score,source,confidence);
          snapshot.reason="RANGE style and strong range conditions support mean reversion.";
          return;
         }
       if(trend_ready)
         {
          snapshot.selected_strategy="TREND_FOLLOWING";
-         snapshot.score=CalculateSelectionScore(environment.trend_score,input,confidence);
+         snapshot.score=CalculateSelectionScore(environment.trend_score,source,confidence);
          snapshot.reason="TREND style and strong trend conditions support trend following.";
          return;
         }
@@ -441,7 +490,7 @@ private:
         {
          snapshot.selected_strategy="HYBRID_ADAPTIVE";
          const double mixed_signal=(environment.range_score+environment.trend_score)/2.0;
-         snapshot.score=CalculateSelectionScore(mixed_signal,input,confidence);
+         snapshot.score=CalculateSelectionScore(mixed_signal,source,confidence);
          snapshot.reason="HYBRID style has valid mixed transition conditions.";
          return;
         }
@@ -513,8 +562,13 @@ private:
 
       for(int index=0;index<symbol_count;index++)
         {
-         if(!parameters.TryGetMarketSelectionSymbol(index,m_symbols[index]))
+         string configured_symbol="";
+
+         if(!parameters.TryGetMarketSelectionSymbol(index,configured_symbol))
+
             return(false);
+
+         m_symbols[index]=configured_symbol;
         }
 
       return(true);
@@ -633,8 +687,8 @@ public:
             continue;
            }
 
-         SStrategySelectionInput input;
-         if(!ReadSymbolInput(m_symbols[index],input))
+         SStrategySelectionInput source;
+         if(!ReadSymbolInput(m_symbols[index],source))
            {
             snapshots[index].reason="Trading Style, Pair Ranking, or Capital Allocation symbol data is unavailable or invalid.";
             all_symbol_data_valid=false;
@@ -644,9 +698,9 @@ public:
          double style_freshness=0.0;
          double pair_freshness=0.0;
          double allocation_freshness=0.0;
-         if(!CalculateFreshness(input.trading_style_updated_at,style_freshness) ||
-            !CalculateFreshness(input.pair_ranking_updated_at,pair_freshness) ||
-            !CalculateFreshness(input.allocation_updated_at,allocation_freshness))
+         if(!CalculateFreshness(source.trading_style_updated_at,style_freshness) ||
+            !CalculateFreshness(source.pair_ranking_updated_at,pair_freshness) ||
+            !CalculateFreshness(source.allocation_updated_at,allocation_freshness))
            {
             snapshots[index].reason="Trading Style, Pair Ranking, or Capital Allocation symbol data is stale.";
             all_symbol_data_valid=false;
@@ -659,7 +713,7 @@ public:
                                  MathMin(style_global_freshness,
                                  MathMin(style_freshness,
                                  MathMin(pair_freshness,allocation_freshness))))));
-         DecideStrategy(environment,input,freshness,snapshots[index]);
+         DecideStrategy(environment,source,freshness,snapshots[index]);
         }
 
       SGlobalStrategySelectionSnapshot global_snapshot;

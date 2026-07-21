@@ -162,19 +162,26 @@ private:
       if(m_data_bus==NULL)
          return(false);
 
+      double volatility_score=0.0;
+      string market_state="";
+      bool range_data_valid=false;
+      bool trend_data_valid=false;
       string updated_at_text="";
-      if(!ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE,
-                     environment.volatility_score) ||
-         !m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_STATE,
-                                environment.market_state) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,
-                      environment.range_data_valid) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID,
-                      environment.trend_data_valid) ||
+      datetime updated_at=0;
+      if(!ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE,volatility_score) ||
+         !m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_STATE,market_state) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,range_data_valid) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID,trend_data_valid) ||
          !m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_UPDATED_AT,
                                 updated_at_text) ||
-         !ReadTimestampText(updated_at_text,environment.updated_at))
+         !ReadTimestampText(updated_at_text,updated_at))
          return(false);
+
+      environment.volatility_score=volatility_score;
+      environment.market_state=market_state;
+      environment.range_data_valid=range_data_valid;
+      environment.trend_data_valid=trend_data_valid;
+      environment.updated_at=updated_at;
 
       if(environment.volatility_score<0.0 || environment.volatility_score>100.0 ||
          !environment.range_data_valid || !environment.trend_data_valid)
@@ -189,58 +196,75 @@ private:
       if(m_data_bus==NULL)
          return(false);
 
+      bool data_valid=false;
       string updated_at_text="";
-      return(ReadBoolean(FENX_DATABUS_KEY_PAIR_RANKING_DATA_VALID,ranking.data_valid) &&
-             m_data_bus.TryGetText(FENX_DATABUS_KEY_PAIR_RANKING_UPDATED_AT,updated_at_text) &&
-             ReadTimestampText(updated_at_text,ranking.updated_at));
+      datetime updated_at=0;
+      if(!ReadBoolean(FENX_DATABUS_KEY_PAIR_RANKING_DATA_VALID,data_valid) ||
+         !m_data_bus.TryGetText(FENX_DATABUS_KEY_PAIR_RANKING_UPDATED_AT,updated_at_text) ||
+         !ReadTimestampText(updated_at_text,updated_at))
+         return(false);
+
+      ranking.data_valid=data_valid;
+      ranking.updated_at=updated_at;
+      return(true);
      }
 
-   bool ReadSymbolInput(const string symbol,SCapitalAllocationInput &input)
+   bool ReadSymbolInput(const string symbol,SCapitalAllocationInput &source)
      {
       if(m_data_bus==NULL)
          return(false);
 
+      string input_symbol="";
       string text="";
       string selection_updated_at_text="";
       string ranking_updated_at_text="";
+      bool is_market_eligible=false;
+      bool is_pair_ranked=false;
+      datetime selection_updated_at=0;
+      datetime ranking_updated_at=0;
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
-                                      FENX_DATABUS_FIELD_MARKET_SELECTION_SYMBOL,input.symbol) ||
-         input.symbol!=symbol ||
+                                      FENX_DATABUS_FIELD_MARKET_SELECTION_SYMBOL,input_symbol) ||
+         input_symbol!=symbol ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_MARKET_SELECTION_IS_ELIGIBLE,text) ||
-         !ReadBooleanText(text,input.is_market_eligible) ||
+         !ReadBooleanText(text,is_market_eligible) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_MARKET_SELECTION_UPDATED_AT,
                                       selection_updated_at_text) ||
-         !ReadTimestampText(selection_updated_at_text,input.selection_updated_at) ||
+         !ReadTimestampText(selection_updated_at_text,selection_updated_at) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                                       FENX_DATABUS_FIELD_PAIR_RANKING_SYMBOL,text) ||
          text!=symbol ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                                       FENX_DATABUS_FIELD_PAIR_RANKING_IS_RANKED,text) ||
-         !ReadBooleanText(text,input.is_pair_ranked) ||
+         !ReadBooleanText(text,is_pair_ranked) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                                       FENX_DATABUS_FIELD_PAIR_RANKING_RANK,text))
          return(false);
 
-      input.pair_rank=(int)StringToInteger(text);
+      source.symbol=input_symbol;
+      source.is_market_eligible=is_market_eligible;
+      source.selection_updated_at=selection_updated_at;
+      source.is_pair_ranked=is_pair_ranked;
+      source.pair_rank=(int)StringToInteger(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                                       FENX_DATABUS_FIELD_PAIR_RANKING_SCORE,text))
          return(false);
-      input.pair_ranking_score=StringToDouble(text);
+      source.pair_ranking_score=StringToDouble(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                                       FENX_DATABUS_FIELD_PAIR_RANKING_CONFIDENCE,text))
          return(false);
-      input.pair_ranking_confidence=StringToDouble(text);
+      source.pair_ranking_confidence=StringToDouble(text);
       if(!m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                                       FENX_DATABUS_FIELD_PAIR_RANKING_UPDATED_AT,
                                       ranking_updated_at_text) ||
-         !ReadTimestampText(ranking_updated_at_text,input.ranking_updated_at))
+         !ReadTimestampText(ranking_updated_at_text,ranking_updated_at))
          return(false);
 
-      return(input.pair_rank>=0 && input.pair_ranking_score>=0.0 &&
-             input.pair_ranking_score<=100.0 && input.pair_ranking_confidence>=0.0 &&
-             input.pair_ranking_confidence<=100.0);
+      source.ranking_updated_at=ranking_updated_at;
+      return(source.pair_rank>=0 && source.pair_ranking_score>=0.0 &&
+             source.pair_ranking_score<=100.0 && source.pair_ranking_confidence>=0.0 &&
+             source.pair_ranking_confidence<=100.0);
      }
 
    bool CalculateFreshness(const datetime updated_at,double &freshness)
@@ -274,16 +298,16 @@ private:
       return(1.0);
      }
 
-   void BuildAllocationScore(const SCapitalAllocationInput &input,
+   void BuildAllocationScore(const SCapitalAllocationInput &source,
                              const SAllocationEnvironment &environment,
                              const double freshness,SCapitalAllocationSnapshot &snapshot)
      {
-      const double confidence_factor=input.pair_ranking_confidence/100.0;
+      const double confidence_factor=source.pair_ranking_confidence/100.0;
       const double volatility_factor=CalculateVolatilityFactor(environment.volatility_score);
       const double transition_factor=CalculateTransitionFactor(environment.market_state);
-      snapshot.allocation_score=ClampPercent(input.pair_ranking_score*confidence_factor*
+      snapshot.allocation_score=ClampPercent(source.pair_ranking_score*confidence_factor*
                                               volatility_factor*transition_factor*(freshness/100.0));
-      snapshot.allocation_confidence=ClampPercent(input.pair_ranking_confidence*(freshness/100.0));
+      snapshot.allocation_confidence=ClampPercent(source.pair_ranking_confidence*(freshness/100.0));
       snapshot.reason="Allocation candidate accepted.";
      }
 
@@ -472,283 +496,258 @@ private:
       if(!m_data_bus.SetText(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_TOTAL_PERCENT,
                              DoubleToString(snapshot.total_allocated_percent,2)))
          success=false;
-      if(!m_data_bus.SetText(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UNALLOCATED_PE…4712 tokens truncated…range_boundary_trim_fraction);
+      if(!m_data_bus.SetText(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UNALLOCATED_PERCENT,
+                             DoubleToString(snapshot.unallocated_percent,2)))
+         success=false;
+      if(!m_data_bus.SetText(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_TOP_SYMBOL,
+                             snapshot.top_allocated_symbol))
+         success=false;
+      if(!m_data_bus.SetText(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_DATA_VALID,
+                             (snapshot.data_valid ? "true" : "false")))
+         success=false;
+      if(!m_data_bus.SetText(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UPDATED_AT,
+                             TimeToString(snapshot.updated_at,TIME_DATE|TIME_SECONDS)))
+         success=false;
+      return(success);
      }
 
-   int               RangeMinBoundaryTouches(void)
+   bool LoadSymbols(CParameterManager &parameters)
      {
-      return(m_range_min_boundary_touches);
-     }
-
-   double            RangeMinWidthPoints(void)
-     {
-      return(m_range_min_width_points);
-     }
-
-   double            RangeMinWidthAtrMultiple(void)
-     {
-      return(m_range_min_width_atr_multiple);
-     }
-
-   double            RangeMaxWidthAtrMultiple(void)
-     {
-      return(m_range_max_width_atr_multiple);
-     }
-
-   double            RangeTouchToleranceAtrFraction(void)
-     {
-      return(m_range_touch_tolerance_atr_fraction);
-     }
-
-   double            RangeBreakBufferAtrFraction(void)
-     {
-      return(m_range_break_buffer_atr_fraction);
-     }
-
-   int               RangeMaxBreakEvents(void)
-     {
-      return(m_range_max_break_events);
-     }
-
-   double            RangeScoreThreshold(void)
-     {
-      return(m_range_score_threshold);
-     }
-
-   int               TrendLookbackBars(void)
-     {
-      return(m_trend_lookback_bars);
-     }
-
-   int               TrendMaPeriod(void)
-     {
-      return(m_trend_ma_period);
-     }
-
-   int               TrendSlopeBars(void)
-     {
-      return(m_trend_slope_bars);
-     }
-
-   int               TrendAdxPeriod(void)
-     {
-      return(m_trend_adx_period);
-     }
-
-   double            TrendMinAdx(void)
-     {
-      return(m_trend_min_adx);
-     }
-
-   double            TrendMinSlopeAtrFraction(void)
-     {
-      return(m_trend_min_slope_atr_fraction);
-     }
-
-   double            TrendMinAtrMovement(void)
-     {
-      return(m_trend_min_atr_movement);
-     }
-
-   double            TrendNoiseAtrFraction(void)
-     {
-      return(m_trend_noise_atr_fraction);
-     }
-
-   double            TrendDirectionScoreThreshold(void)
-     {
-      return(m_trend_direction_score_threshold);
-     }
-
-   double            TrendStrengthThreshold(void)
-     {
-      return(m_trend_strength_threshold);
-     }
-
-   double            TrendConfidenceThreshold(void)
-     {
-      return(m_trend_confidence_threshold);
-     }
-
-   double            MarketRangeScoreThreshold(void)
-     {
-      return(m_market_range_score_threshold);
-     }
-
-   double            MarketRangeMaxTrendScore(void)
-     {
-      return(m_market_range_max_trend_score);
-     }
-
-   double            MarketTrendScoreThreshold(void)
-     {
-      return(m_market_trend_score_threshold);
-     }
-
-   double            MarketVolatilityScoreThreshold(void)
-     {
-      return(m_market_volatility_score_threshold);
-     }
-
-   double            MarketTrendMinAdx(void)
-     {
-      return(m_market_trend_min_adx);
-     }
-
-   bool              SetMarketSelectionSymbols(string &symbols[])
-     {
-      const int symbol_count=ArraySize(symbols);
-      if(symbol_count<1 || symbol_count>FENX_MARKET_SELECTION_MAX_SYMBOLS)
+      const int symbol_count=parameters.MarketSelectionSymbolCount();
+      if(symbol_count<1 || symbol_count>FENX_MARKET_SELECTION_MAX_SYMBOLS ||
+         ArrayResize(m_symbols,symbol_count)!=symbol_count)
          return(false);
 
       for(int index=0;index<symbol_count;index++)
         {
-         if(StringLen(symbols[index])==0)
+         string configured_symbol="";
+         if(!parameters.TryGetMarketSelectionSymbol(index,configured_symbol) ||
+            StringLen(configured_symbol)==0)
             return(false);
+         m_symbols[index]=configured_symbol;
         }
-
-      if(ArrayResize(m_market_selection_symbols,symbol_count)!=symbol_count)
-         return(false);
-
-      for(int index=0;index<symbol_count;index++)
-         m_market_selection_symbols[index]=symbols[index];
-
       return(true);
      }
 
-   int               MarketSelectionSymbolCount(void)
+public:
+                     CCapitalAllocationEngine(void)
      {
-      return(ArraySize(m_market_selection_symbols));
+      SetName("CapitalAllocationEngine");
+      m_total_budget=0.0;
+      m_max_per_symbol=0.0;
+      m_min_threshold=0.0;
+      m_max_funded_symbols=0;
+      m_concentration_limit=0.0;
+      m_confidence_threshold=0.0;
+      m_stale_data_limit_seconds=0;
+      m_volatility_penalty=0.0;
+      m_transition_penalty=0.0;
+      m_high_volatility_score=0.0;
      }
 
-   bool              TryGetMarketSelectionSymbol(const int index,string &symbol)
+   virtual bool       Initialize(CDataBus &data_bus,CParameterManager &parameters)
      {
-      if(index<0 || index>=ArraySize(m_market_selection_symbols))
+      if(!CBaseEngine::Initialize(data_bus,parameters))
          return(false);
 
-      symbol=m_market_selection_symbols[index];
-      return(StringLen(symbol)>0);
+      m_total_budget=parameters.CapitalAllocationTotalBudget();
+      m_max_per_symbol=parameters.CapitalAllocationMaxPerSymbol();
+      m_min_threshold=parameters.CapitalAllocationMinThreshold();
+      m_max_funded_symbols=parameters.CapitalAllocationMaxFundedSymbols();
+      m_concentration_limit=parameters.CapitalAllocationConcentrationLimit();
+      m_confidence_threshold=parameters.CapitalAllocationConfidenceThreshold();
+      m_stale_data_limit_seconds=parameters.CapitalAllocationStaleDataLimitSeconds();
+      m_volatility_penalty=parameters.CapitalAllocationVolatilityPenalty();
+      m_transition_penalty=parameters.CapitalAllocationTransitionPenalty();
+      m_high_volatility_score=parameters.MarketSelectionMaxVolatilityScore();
+
+      const double effective_cap=MathMin(m_max_per_symbol,
+                                         m_total_budget*(m_concentration_limit/100.0));
+      if(!LoadSymbols(parameters) || m_total_budget<=0.0 || m_total_budget>100.0 ||
+         m_max_per_symbol<=0.0 || m_max_per_symbol>100.0 ||
+         m_min_threshold<=0.0 || m_min_threshold>m_max_per_symbol ||
+         m_max_funded_symbols<1 ||
+         m_max_funded_symbols>FENX_MARKET_SELECTION_MAX_SYMBOLS ||
+         m_concentration_limit<=0.0 || m_concentration_limit>=100.0 ||
+         m_confidence_threshold<0.0 || m_confidence_threshold>100.0 ||
+         m_stale_data_limit_seconds<1 || m_volatility_penalty<0.0 ||
+         m_volatility_penalty>100.0 || m_transition_penalty<0.0 ||
+         m_transition_penalty>100.0 || m_high_volatility_score<=0.0 ||
+         m_high_volatility_score>100.0 || effective_cap<m_min_threshold)
+        {
+         CLogger::Error("CapitalAllocationEngine received invalid configuration.");
+         CBaseEngine::Shutdown();
+         return(false);
+        }
+
+      CLogger::Info(StringFormat("CapitalAllocationEngine configured for %d symbol(s).",
+                                 ArraySize(m_symbols)));
+      return(true);
      }
 
-   int               MarketSelectionMinHistoryBars(void)
+   virtual void       Update(void)
      {
-      return(m_market_selection_min_history_bars);
+      if(!m_initialized)
+         return;
+
+      SAllocationEnvironment environment;
+      SAllocationRankingGlobal ranking_global;
+      double environment_freshness=0.0;
+      double ranking_freshness=0.0;
+      bool environment_valid=ReadEnvironment(environment);
+      bool ranking_global_valid=ReadRankingGlobal(ranking_global);
+      if(environment_valid)
+         environment_valid=CalculateFreshness(environment.updated_at,environment_freshness);
+      if(ranking_global_valid)
+         ranking_global_valid=(ranking_global.data_valid &&
+                               CalculateFreshness(ranking_global.updated_at,ranking_freshness));
+      if(!environment_valid || !ranking_global_valid)
+         CLogger::Warning("CapitalAllocationEngine is waiting for valid, fresh upstream data.");
+
+      const int symbol_count=ArraySize(m_symbols);
+      SCapitalAllocationSnapshot snapshots[];
+      if(ArrayResize(snapshots,symbol_count)!=symbol_count)
+        {
+         CLogger::Error("CapitalAllocationEngine could not allocate per-symbol snapshots.");
+         return;
+        }
+
+      SCapitalAllocationCandidate candidates[];
+      bool all_symbol_data_valid=true;
+      for(int index=0;index<symbol_count;index++)
+        {
+         ResetSnapshot(snapshots[index],m_symbols[index]);
+         if(!environment_valid || !ranking_global_valid)
+           {
+            snapshots[index].reason="Environment or Pair Ranking data is unavailable, invalid, or stale.";
+            continue;
+           }
+
+         SCapitalAllocationInput source;
+         if(!ReadSymbolInput(m_symbols[index],source))
+           {
+            snapshots[index].reason="Market Selection or Pair Ranking data is unavailable or invalid.";
+            all_symbol_data_valid=false;
+            continue;
+           }
+
+         double selection_freshness=0.0;
+         double symbol_ranking_freshness=0.0;
+         if(!CalculateFreshness(source.selection_updated_at,selection_freshness) ||
+            !CalculateFreshness(source.ranking_updated_at,symbol_ranking_freshness))
+           {
+            snapshots[index].reason="Market Selection or Pair Ranking data is stale.";
+            all_symbol_data_valid=false;
+            continue;
+           }
+
+         if(!source.is_market_eligible)
+           {
+            snapshots[index].reason="Market Selection rejected this symbol.";
+            continue;
+           }
+         if(!source.is_pair_ranked)
+           {
+            snapshots[index].reason="Pair Ranking did not rank this symbol.";
+            continue;
+           }
+         if(source.pair_ranking_confidence<m_confidence_threshold)
+           {
+            snapshots[index].reason="Pair Ranking confidence is below the allocation threshold.";
+            continue;
+           }
+         if(environment.market_state=="VOLATILE")
+           {
+            snapshots[index].reason="Environment market state is VOLATILE.";
+            continue;
+           }
+
+         const double freshness=MathMin(MathMin(environment_freshness,ranking_freshness),
+                                        MathMin(selection_freshness,
+                                                symbol_ranking_freshness));
+         BuildAllocationScore(source,environment,freshness,snapshots[index]);
+         if(snapshots[index].allocation_score<=0.0)
+           {
+            snapshots[index].reason="Allocation score is not positive.";
+            continue;
+           }
+
+         const int candidate_index=ArraySize(candidates);
+         if(ArrayResize(candidates,candidate_index+1)!=(candidate_index+1))
+           {
+            snapshots[index].reason="Capital Allocation could not allocate a candidate.";
+            all_symbol_data_valid=false;
+            CLogger::Error("CapitalAllocationEngine could not allocate a candidate.");
+            continue;
+           }
+         candidates[candidate_index].snapshot_index=index;
+         candidates[candidate_index].pair_rank=source.pair_rank;
+        }
+
+      SortCandidates(candidates,snapshots);
+      int candidate_count=ArraySize(candidates);
+      if(candidate_count>m_max_funded_symbols)
+         candidate_count=m_max_funded_symbols;
+
+      bool funded[];
+      if(ArrayResize(funded,candidate_count)!=candidate_count)
+        {
+         CLogger::Error("CapitalAllocationEngine could not allocate funding flags.");
+         return;
+        }
+      for(int index=0;index<candidate_count;index++)
+         funded[index]=true;
+      for(int index=candidate_count;index<ArraySize(candidates);index++)
+        {
+         const int snapshot_index=candidates[index].snapshot_index;
+         snapshots[snapshot_index].reason="Candidate is outside the funded-symbol limit.";
+        }
+
+      const double effective_cap=MathMin(m_max_per_symbol,
+                                         m_total_budget*(m_concentration_limit/100.0));
+      if(candidate_count>0)
+         ApplyMinimumThreshold(candidates,candidate_count,funded,snapshots,effective_cap);
+
+      SGlobalCapitalAllocationSnapshot global_snapshot;
+      ResetGlobalSnapshot(global_snapshot);
+      global_snapshot.data_valid=(environment_valid && ranking_global_valid &&
+                                  all_symbol_data_valid);
+      for(int index=0;index<candidate_count;index++)
+        {
+         const int snapshot_index=candidates[index].snapshot_index;
+         if(!funded[index] ||
+            snapshots[snapshot_index].allocation_percent<
+               m_min_threshold-FENX_PAIR_RANKING_COMPARE_EPSILON)
+            continue;
+
+         snapshots[snapshot_index].is_allocated=true;
+         snapshots[snapshot_index].reason="Capital allocation recommendation is active.";
+         global_snapshot.allocated_symbol_count++;
+         global_snapshot.total_allocated_percent+=
+            snapshots[snapshot_index].allocation_percent;
+         if(StringLen(global_snapshot.top_allocated_symbol)==0)
+            global_snapshot.top_allocated_symbol=snapshots[snapshot_index].symbol;
+        }
+      global_snapshot.total_allocated_percent=
+         ClampPercent(global_snapshot.total_allocated_percent);
+      global_snapshot.unallocated_percent=
+         ClampPercent(100.0-global_snapshot.total_allocated_percent);
+
+      for(int index=0;index<symbol_count;index++)
+        {
+         if(!PublishSnapshot(snapshots[index]))
+            CLogger::Error(StringFormat("CapitalAllocationEngine could not publish %s.",
+                                        snapshots[index].symbol));
+        }
+      if(!PublishGlobalSnapshot(global_snapshot))
+         CLogger::Error("CapitalAllocationEngine could not publish global allocation data.");
      }
 
-   double            MarketSelectionMaxSpreadPoints(void)
+   virtual void       Shutdown(void)
      {
-      return(m_market_selection_max_spread_points);
-     }
-
-   double            MarketSelectionMaxSpreadToAtrRatio(void)
-     {
-      return(m_market_selection_max_spread_to_atr_ratio);
-     }
-
-   double            MarketSelectionMinVolatilityScore(void)
-     {
-      return(m_market_selection_min_volatility_score);
-     }
-
-   double            MarketSelectionMaxVolatilityScore(void)
-     {
-      return(m_market_selection_max_volatility_score);
-     }
-
-   double            MarketSelectionMinScore(void)
-     {
-      return(m_market_selection_min_score);
-     }
-
-   double            MarketSelectionTransitionPenalty(void)
-     {
-      return(m_market_selection_transition_penalty);
-     }
-
-   int               PairRankingMaxDataAgeSeconds(void)
-     {
-      return(m_pair_ranking_max_data_age_seconds);
-     }
-
-   double            PairRankingWeightSelectionScore(void)
-     {
-      return(m_pair_ranking_weight_selection_score);
-     }
-
-   double            PairRankingWeightSelectionConfidence(void)
-     {
-      return(m_pair_ranking_weight_selection_confidence);
-     }
-
-   double            PairRankingWeightSpreadEfficiency(void)
-     {
-      return(m_pair_ranking_weight_spread_efficiency);
-     }
-
-   double            PairRankingWeightEnvironmentConfidence(void)
-     {
-      return(m_pair_ranking_weight_environment_confidence);
-     }
-
-   double            PairRankingWeightVolatilitySuitability(void)
-     {
-      return(m_pair_ranking_weight_volatility_suitability);
-     }
-
-   double            PairRankingWeightRegimeSuitability(void)
-     {
-      return(m_pair_ranking_weight_regime_suitability);
-     }
-
-   double            PairRankingWeightFreshness(void)
-     {
-      return(m_pair_ranking_weight_freshness);
-     }
-
-   double            CapitalAllocationTotalBudget(void)
-     {
-      return(m_capital_allocation_total_budget);
-     }
-
-   double            CapitalAllocationMaxPerSymbol(void)
-     {
-      return(m_capital_allocation_max_per_symbol);
-     }
-
-   double            CapitalAllocationMinThreshold(void)
-     {
-      return(m_capital_allocation_min_threshold);
-     }
-
-   int               CapitalAllocationMaxFundedSymbols(void)
-     {
-      return(m_capital_allocation_max_funded_symbols);
-     }
-
-   double            CapitalAllocationConcentrationLimit(void)
-     {
-      return(m_capital_allocation_concentration_limit);
-     }
-
-   double            CapitalAllocationConfidenceThreshold(void)
-     {
-      return(m_capital_allocation_confidence_threshold);
-     }
-
-   int               CapitalAllocationStaleDataLimitSeconds(void)
-     {
-      return(m_capital_allocation_stale_data_limit_seconds);
-     }
-
-   double            CapitalAllocationVolatilityPenalty(void)
-     {
-      return(m_capital_allocation_volatility_penalty);
-     }
-
-   double            CapitalAllocationTransitionPenalty(void)
-     {
-      return(m_capital_allocation_transition_penalty);
+      ArrayFree(m_symbols);
+      CBaseEngine::Shutdown();
      }
   };
 
-#endif // FENX_CONFIG_PARAMETER_MANAGER_MQH
+#endif // FENX_CAPITAL_ALLOCATION_ENGINE_MQH

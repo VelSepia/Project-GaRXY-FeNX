@@ -287,27 +287,42 @@ private:
      {
       if(m_data_bus==NULL)
          return(false);
-      if(!m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_STATE,
-                                environment.market_state) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_CONFIDENCE,
-                     environment.market_confidence) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE,
-                     environment.volatility_score) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_SCORE,environment.range_score) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_SCORE,environment.trend_score) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_STRENGTH,
-                     environment.trend_strength) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,
-                      environment.range_data_valid) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID,
-                      environment.trend_data_valid) ||
-         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_UPDATED_AT,
-                        environment.market_updated_at) ||
-         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_UPDATED_AT,
-                        environment.range_updated_at) ||
-         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_TREND_UPDATED_AT,
-                        environment.trend_updated_at))
+
+      string market_state="";
+      double market_confidence=0.0;
+      double volatility_score=0.0;
+      double range_score=0.0;
+      double trend_score=0.0;
+      double trend_strength=0.0;
+      bool range_data_valid=false;
+      bool trend_data_valid=false;
+      datetime market_updated_at=0;
+      datetime range_updated_at=0;
+      datetime trend_updated_at=0;
+      if(!m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_STATE,market_state) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_CONFIDENCE,market_confidence) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE,volatility_score) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_SCORE,range_score) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_SCORE,trend_score) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_STRENGTH,trend_strength) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,range_data_valid) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID,trend_data_valid) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_UPDATED_AT,market_updated_at) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_UPDATED_AT,range_updated_at) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_TREND_UPDATED_AT,trend_updated_at))
          return(false);
+
+      environment.market_state=market_state;
+      environment.market_confidence=market_confidence;
+      environment.volatility_score=volatility_score;
+      environment.range_score=range_score;
+      environment.trend_score=trend_score;
+      environment.trend_strength=trend_strength;
+      environment.range_data_valid=range_data_valid;
+      environment.trend_data_valid=trend_data_valid;
+      environment.market_updated_at=market_updated_at;
+      environment.range_updated_at=range_updated_at;
+      environment.trend_updated_at=trend_updated_at;
 
       return((environment.market_state=="RANGING" || environment.market_state=="TRENDING" ||
               environment.market_state=="VOLATILE" || environment.market_state=="TRANSITION") &&
@@ -320,32 +335,57 @@ private:
 
    bool ReadPipeline(SRiskPipeline &pipeline)
      {
-      return(ReadBoolean(FENX_DATABUS_KEY_PAIR_RANKING_DATA_VALID,
-                         pipeline.pair_ranking_valid) &&
-             ReadTimestamp(FENX_DATABUS_KEY_PAIR_RANKING_UPDATED_AT,
-                           pipeline.pair_ranking_updated_at) &&
-             ReadBoolean(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_DATA_VALID,
-                         pipeline.allocation_valid) &&
-             ReadTimestamp(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UPDATED_AT,
-                           pipeline.allocation_updated_at) &&
-             ReadDouble(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_TOTAL_PERCENT,
-                        pipeline.total_allocated_percent) &&
-             ReadBoolean(FENX_DATABUS_KEY_TRADING_STYLE_DATA_VALID,pipeline.style_valid) &&
-             ReadTimestamp(FENX_DATABUS_KEY_TRADING_STYLE_UPDATED_AT,
-                           pipeline.style_updated_at) &&
-             ReadBoolean(FENX_DATABUS_KEY_STRATEGY_SELECTION_DATA_VALID,
-                         pipeline.strategy_valid) &&
-             ReadTimestamp(FENX_DATABUS_KEY_STRATEGY_SELECTION_UPDATED_AT,
-                           pipeline.strategy_updated_at) &&
-             ReadBoolean(FENX_DATABUS_KEY_STANDBY_SYSTEM_VALID,pipeline.standby_valid) &&
-             ReadTimestamp(FENX_DATABUS_KEY_STANDBY_SYSTEM_UPDATED_AT,
-                           pipeline.standby_updated_at) &&
-             ReadInteger(FENX_DATABUS_KEY_STANDBY_ACTIVE_SYMBOL_COUNT,
-                         pipeline.standby_active_count) &&
-             ReadInteger(FENX_DATABUS_KEY_STANDBY_ESCALATION_PENDING_COUNT,
-                         pipeline.standby_escalation_count) &&
-             ReadInteger(FENX_DATABUS_KEY_STANDBY_RISK_STOP_PENDING_COUNT,
-                         pipeline.standby_risk_stop_count));
+      bool pair_ranking_valid=false;
+      datetime pair_ranking_updated_at=0;
+      bool allocation_valid=false;
+      datetime allocation_updated_at=0;
+      double total_allocated_percent=0.0;
+      bool style_valid=false;
+      datetime style_updated_at=0;
+      bool strategy_valid=false;
+      datetime strategy_updated_at=0;
+      bool standby_valid=false;
+      datetime standby_updated_at=0;
+      int standby_active_count=0;
+      int standby_escalation_count=0;
+      int standby_risk_stop_count=0;
+      if(!ReadBoolean(FENX_DATABUS_KEY_PAIR_RANKING_DATA_VALID,pair_ranking_valid) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_PAIR_RANKING_UPDATED_AT,pair_ranking_updated_at) ||
+         !ReadBoolean(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_DATA_VALID,allocation_valid) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UPDATED_AT,
+                        allocation_updated_at) ||
+         !ReadDouble(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_TOTAL_PERCENT,
+                     total_allocated_percent) ||
+         !ReadBoolean(FENX_DATABUS_KEY_TRADING_STYLE_DATA_VALID,style_valid) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_TRADING_STYLE_UPDATED_AT,style_updated_at) ||
+         !ReadBoolean(FENX_DATABUS_KEY_STRATEGY_SELECTION_DATA_VALID,strategy_valid) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_STRATEGY_SELECTION_UPDATED_AT,
+                        strategy_updated_at) ||
+         !ReadBoolean(FENX_DATABUS_KEY_STANDBY_SYSTEM_VALID,standby_valid) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_STANDBY_SYSTEM_UPDATED_AT,standby_updated_at) ||
+         !ReadInteger(FENX_DATABUS_KEY_STANDBY_ACTIVE_SYMBOL_COUNT,
+                      standby_active_count) ||
+         !ReadInteger(FENX_DATABUS_KEY_STANDBY_ESCALATION_PENDING_COUNT,
+                      standby_escalation_count) ||
+         !ReadInteger(FENX_DATABUS_KEY_STANDBY_RISK_STOP_PENDING_COUNT,
+                      standby_risk_stop_count))
+         return(false);
+
+      pipeline.pair_ranking_valid=pair_ranking_valid;
+      pipeline.pair_ranking_updated_at=pair_ranking_updated_at;
+      pipeline.allocation_valid=allocation_valid;
+      pipeline.allocation_updated_at=allocation_updated_at;
+      pipeline.total_allocated_percent=total_allocated_percent;
+      pipeline.style_valid=style_valid;
+      pipeline.style_updated_at=style_updated_at;
+      pipeline.strategy_valid=strategy_valid;
+      pipeline.strategy_updated_at=strategy_updated_at;
+      pipeline.standby_valid=standby_valid;
+      pipeline.standby_updated_at=standby_updated_at;
+      pipeline.standby_active_count=standby_active_count;
+      pipeline.standby_escalation_count=standby_escalation_count;
+      pipeline.standby_risk_stop_count=standby_risk_stop_count;
+      return(true);
      }
 
    bool ReadSymbolBoolean(const string name_space,const string symbol,const string field,
@@ -390,93 +430,442 @@ private:
              ReadTimestampText(text,value));
      }
 
-   bool ReadSymbolInput(const string symbol,SRiskInput &input)
+   bool ReadSymbolInput(const string symbol,SRiskInput &source)
      {
       if(m_data_bus==NULL)
          return(false);
-      input.symbol=symbol;
+
+      bool is_market_eligible=false;
+      datetime market_selection_updated_at=0;
+      bool is_pair_ranked=false;
+      int pair_rank=0;
+      double pair_ranking_score=0.0;
+      double pair_ranking_confidence=0.0;
+      datetime pair_ranking_updated_at=0;
+      bool is_capital_allocated=false;
+      double capital_allocation_percent=0.0;
+      datetime capital_allocation_updated_at=0;
+      string trading_style="";
+      double trading_style_confidence=0.0;
+      bool is_trading_style_valid=false;
+      datetime trading_style_updated_at=0;
+      string selected_strategy="";
+      double strategy_selection_confidence=0.0;
+      bool is_strategy_selection_valid=false;
+      datetime strategy_selection_updated_at=0;
+      string standby_state="";
+      bool is_standby_active=false;
+      bool are_new_entries_allowed=false;
+      double standby_escalation_score=0.0;
+      string standby_recommended_next_state="";
+      bool standby_data_valid=false;
+      datetime standby_updated_at=0;
       if(!ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                             FENX_DATABUS_FIELD_MARKET_SELECTION_IS_ELIGIBLE,
-                            input.is_market_eligible) ||
+                            is_market_eligible) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                               FENX_DATABUS_FIELD_MARKET_SELECTION_UPDATED_AT,
-                              input.market_selection_updated_at) ||
+                              market_selection_updated_at) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
-                            FENX_DATABUS_FIELD_PAIR_RANKING_IS_RANKED,
-                            input.is_pair_ranked) ||
+                            FENX_DATABUS_FIELD_PAIR_RANKING_IS_RANKED,is_pair_ranked) ||
          !ReadSymbolInteger(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
-                            FENX_DATABUS_FIELD_PAIR_RANKING_RANK,input.pair_rank) ||
+                            FENX_DATABUS_FIELD_PAIR_RANKING_RANK,pair_rank) ||
          !ReadSymbolDouble(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
-                           FENX_DATABUS_FIELD_PAIR_RANKING_SCORE,input.pair_ranking_score) ||
+                           FENX_DATABUS_FIELD_PAIR_RANKING_SCORE,pair_ranking_score) ||
          !ReadSymbolDouble(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                            FENX_DATABUS_FIELD_PAIR_RANKING_CONFIDENCE,
-                           input.pair_ranking_confidence) ||
+                           pair_ranking_confidence) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                               FENX_DATABUS_FIELD_PAIR_RANKING_UPDATED_AT,
-                              input.pair_ranking_updated_at) ||
+                              pair_ranking_updated_at) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_CAPITAL_ALLOCATION,symbol,
                             FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_IS_ALLOCATED,
-                            input.is_capital_allocated) ||
+                            is_capital_allocated) ||
          !ReadSymbolDouble(FENX_DATABUS_NAMESPACE_CAPITAL_ALLOCATION,symbol,
                            FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_PERCENT,
-                           input.capital_allocation_percent) ||
+                           capital_allocation_percent) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_CAPITAL_ALLOCATION,symbol,
                               FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_UPDATED_AT,
-                              input.capital_allocation_updated_at) ||
+                              capital_allocation_updated_at) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
-                                      FENX_DATABUS_FIELD_TRADING_STYLE,input.trading_style) ||
+                                      FENX_DATABUS_FIELD_TRADING_STYLE,trading_style) ||
          !ReadSymbolDouble(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
                            FENX_DATABUS_FIELD_TRADING_STYLE_CONFIDENCE,
-                           input.trading_style_confidence) ||
+                           trading_style_confidence) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
                             FENX_DATABUS_FIELD_TRADING_STYLE_IS_VALID,
-                            input.is_trading_style_valid) ||
+                            is_trading_style_valid) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
                               FENX_DATABUS_FIELD_TRADING_STYLE_UPDATED_AT,
-                              input.trading_style_updated_at) ||
+                              trading_style_updated_at) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_STRATEGY_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_SELECTED_STRATEGY,
-                                      input.selected_strategy) ||
+                                      selected_strategy) ||
          !ReadSymbolDouble(FENX_DATABUS_NAMESPACE_STRATEGY_SELECTION,symbol,
                            FENX_DATABUS_FIELD_STRATEGY_SELECTION_CONFIDENCE,
-                           input.strategy_selection_confidence) ||
+                           strategy_selection_confidence) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_STRATEGY_SELECTION,symbol,
                             FENX_DATABUS_FIELD_STRATEGY_SELECTION_IS_VALID,
-                            input.is_strategy_selection_valid) ||
+                            is_strategy_selection_valid) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_STRATEGY_SELECTION,symbol,
                               FENX_DATABUS_FIELD_STRATEGY_SELECTION_UPDATED_AT,
-                              input.strategy_selection_updated_at) ||
+                              strategy_selection_updated_at) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_STANDBY,symbol,
-                                      FENX_DATABUS_FIELD_STANDBY_STATE,input.standby_state) ||
+                                      FENX_DATABUS_FIELD_STANDBY_STATE,standby_state) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_STANDBY,symbol,
-                            FENX_DATABUS_FIELD_STANDBY_IS_ACTIVE,input.is_standby_active) ||
+                            FENX_DATABUS_FIELD_STANDBY_IS_ACTIVE,is_standby_active) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_STANDBY,symbol,
                             FENX_DATABUS_FIELD_STANDBY_NEW_ENTRIES_ALLOWED,
-                            input.are_new_entries_allowed) ||
+                            are_new_entries_allowed) ||
          !ReadSymbolDouble(FENX_DATABUS_NAMESPACE_STANDBY,symbol,
                            FENX_DATABUS_FIELD_STANDBY_ESCALATION_SCORE,
-                           input.standby_escalation_score) ||
+                           standby_escalation_score) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_STANDBY,symbol,
                                       FENX_DATABUS_FIELD_STANDBY_RECOMMENDED_NEXT_STATE,
-                                      input.standby_recommended_next_state) ||
+                                      standby_recommended_next_state) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_STANDBY,symbol,
-                            FENX_DATABUS_FIELD_STANDBY_DATA_VALID,input.standby_data_valid) ||
+                            FENX_DATABUS_FIELD_STANDBY_DATA_VALID,standby_data_valid) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_STANDBY,symbol,
-                              FENX_DATABUS_FIELD_STANDBY_UPDATED_AT,input.standby_updated_at))
+                              FENX_DATABUS_FIELD_STANDBY_UPDATED_AT,standby_updated_at))
          return(false);
 
-      return(input.pair_rank>=0 && input.pair_ranking_score>=0.0 &&
-             input.pair_ranking_score<=100.0 && input.pair_ranking_confidence>=0.0 &&
-             input.pair_ranking_confidence<=100.0 && input.capital_allocation_percent>=0.0 &&
-             input.capital_allocation_percent<=100.0 && input.trading_style_confidence>=0.0 &&
-             input.trading_style_confidence<=100.0 && input.strategy_selection_confidence>=0.0 &&
-             input.strategy_selection_confidence<=100.0 && input.standby_escalation_score>=0.0 &&
-             input.standby_escalation_score<=100.0 &&
-             (input.trading_style=="RANGE" || input.trading_style=="TREND" ||
-              input.trading_style=="HYBRID" || input.trading_style=="STANDBY") &&
-             (input.selected_strategy=="RANGE_MEAN_REVERSION" ||
-              input.selected_strategy=="TREND_FOLLOWING" || input.selected_strategy=="BREAKOUT" ||
-              input.selected_strategy=="HYBRID_ADAPTIVE" || input.selected_strategy…3362 tokens truncated… : "false"))) success=false;
+      source.symbol=symbol;
+      source.is_market_eligible=is_market_eligible;
+      source.market_selection_updated_at=market_selection_updated_at;
+      source.is_pair_ranked=is_pair_ranked;
+      source.pair_rank=pair_rank;
+      source.pair_ranking_score=pair_ranking_score;
+      source.pair_ranking_confidence=pair_ranking_confidence;
+      source.pair_ranking_updated_at=pair_ranking_updated_at;
+      source.is_capital_allocated=is_capital_allocated;
+      source.capital_allocation_percent=capital_allocation_percent;
+      source.capital_allocation_updated_at=capital_allocation_updated_at;
+      source.trading_style=trading_style;
+      source.trading_style_confidence=trading_style_confidence;
+      source.is_trading_style_valid=is_trading_style_valid;
+      source.trading_style_updated_at=trading_style_updated_at;
+      source.selected_strategy=selected_strategy;
+      source.strategy_selection_confidence=strategy_selection_confidence;
+      source.is_strategy_selection_valid=is_strategy_selection_valid;
+      source.strategy_selection_updated_at=strategy_selection_updated_at;
+      source.standby_state=standby_state;
+      source.is_standby_active=is_standby_active;
+      source.are_new_entries_allowed=are_new_entries_allowed;
+      source.standby_escalation_score=standby_escalation_score;
+      source.standby_recommended_next_state=standby_recommended_next_state;
+      source.standby_data_valid=standby_data_valid;
+      source.standby_updated_at=standby_updated_at;
+
+      return(source.pair_rank>=0 && source.pair_ranking_score>=0.0 &&
+             source.pair_ranking_score<=100.0 && source.pair_ranking_confidence>=0.0 &&
+             source.pair_ranking_confidence<=100.0 && source.capital_allocation_percent>=0.0 &&
+             source.capital_allocation_percent<=100.0 && source.trading_style_confidence>=0.0 &&
+             source.trading_style_confidence<=100.0 && source.strategy_selection_confidence>=0.0 &&
+             source.strategy_selection_confidence<=100.0 && source.standby_escalation_score>=0.0 &&
+             source.standby_escalation_score<=100.0 &&
+             (source.trading_style=="RANGE" || source.trading_style=="TREND" ||
+              source.trading_style=="HYBRID" || source.trading_style=="STANDBY") &&
+             (source.selected_strategy=="RANGE_MEAN_REVERSION" ||
+              source.selected_strategy=="TREND_FOLLOWING" || source.selected_strategy=="BREAKOUT" ||
+              source.selected_strategy=="HYBRID_ADAPTIVE" || source.selected_strategy=="NO_TRADE") &&
+             (source.standby_state=="NORMAL" || source.standby_state=="ENTERING_STANDBY" ||
+              source.standby_state=="STANDBY" || source.standby_state=="RECOVERY_PENDING" ||
+              source.standby_state=="ESCALATION_PENDING" ||
+              source.standby_state=="RISK_STOP_PENDING"));
+     }
+
+   bool IsTimestampFresh(const datetime updated_at)
+     {
+      if(updated_at<=0 || m_stale_data_limit_seconds<=0)
+         return(false);
+      const long age_seconds=(long)(TimeCurrent()-updated_at);
+      return(age_seconds>=0 && age_seconds<=m_stale_data_limit_seconds);
+     }
+
+   bool IsEnvironmentFresh(const SRiskEnvironment &environment)
+     {
+      return(IsTimestampFresh(environment.market_updated_at) &&
+             IsTimestampFresh(environment.range_updated_at) &&
+             IsTimestampFresh(environment.trend_updated_at));
+     }
+
+   bool IsPipelineFresh(const SRiskPipeline &pipeline)
+     {
+      return(IsTimestampFresh(pipeline.pair_ranking_updated_at) &&
+             IsTimestampFresh(pipeline.allocation_updated_at) &&
+             IsTimestampFresh(pipeline.style_updated_at) &&
+             IsTimestampFresh(pipeline.strategy_updated_at) &&
+             IsTimestampFresh(pipeline.standby_updated_at));
+     }
+
+   bool IsInputFresh(const SRiskInput &source)
+     {
+      return(IsTimestampFresh(source.market_selection_updated_at) &&
+             IsTimestampFresh(source.pair_ranking_updated_at) &&
+             IsTimestampFresh(source.capital_allocation_updated_at) &&
+             IsTimestampFresh(source.trading_style_updated_at) &&
+             IsTimestampFresh(source.strategy_selection_updated_at) &&
+             IsTimestampFresh(source.standby_updated_at));
+     }
+
+   bool LoadSymbols(CParameterManager &parameters)
+     {
+      const int symbol_count=parameters.MarketSelectionSymbolCount();
+      if(symbol_count<0 || symbol_count>FENX_MARKET_SELECTION_MAX_SYMBOLS ||
+         ArrayResize(m_symbols,symbol_count)!=symbol_count ||
+         ArrayResize(m_runtime,symbol_count)!=symbol_count)
+         return(false);
+
+      for(int index=0;index<symbol_count;index++)
+        {
+         string configured_symbol="";
+
+         if(!parameters.TryGetMarketSelectionSymbol(index,configured_symbol) ||
+
+            StringLen(configured_symbol)==0)
+
+            return(false);
+
+         m_symbols[index]=configured_symbol;
+         ResetRuntime(m_runtime[index]);
+        }
+      return(true);
+     }
+
+   double AllocationMultiplier(const string state)
+     {
+      if(state=="SAFE")
+         return(1.0);
+      if(state=="CAUTION")
+         return(m_caution_allocation_multiplier);
+      if(state=="REDUCED")
+         return(m_reduced_allocation_multiplier);
+      return(0.0);
+     }
+
+   int RiskStateSeverity(const string state)
+     {
+      if(state=="CAUTION") return(1);
+      if(state=="REDUCED") return(2);
+      if(state=="SUSPENDED") return(3);
+      if(state=="RISK_STOP_REQUIRED") return(4);
+      return(0);
+     }
+
+   string RiskStateFromSeverity(const int severity)
+     {
+      if(severity>=4) return("RISK_STOP_REQUIRED");
+      if(severity==3) return("SUSPENDED");
+      if(severity==2) return("REDUCED");
+      if(severity==1) return("CAUTION");
+      return("SAFE");
+     }
+
+   void SetRuntimeState(SRiskRuntime &runtime,const string state,const string subject,
+                        const string reason)
+     {
+      if(runtime.state==state)
+         return;
+
+      const string previous_state=runtime.state;
+      runtime.state=state;
+      runtime.state_changed_at=TimeCurrent();
+      runtime.unsafe_confirmation_count=0;
+      runtime.recovery_confirmation_count=0;
+      if(RiskStateSeverity(state)>RiskStateSeverity(previous_state))
+         CLogger::Warning(StringFormat("RiskEngine %s: %s -> %s. %s",
+                                      subject,previous_state,state,reason));
+      else
+         CLogger::Info(StringFormat("RiskEngine %s: %s -> %s. %s",
+                                   subject,previous_state,state,reason));
+     }
+
+   bool IsRiskCooldownComplete(const SRiskRuntime &runtime)
+     {
+      if(runtime.state_changed_at<=0 || m_transition_cooldown_seconds<=0)
+         return(true);
+      const long elapsed_seconds=(long)(TimeCurrent()-runtime.state_changed_at);
+      return(elapsed_seconds>=m_transition_cooldown_seconds);
+     }
+
+   string ApplyHysteresis(SRiskRuntime &runtime,const string candidate,const string subject,
+                          const string reason)
+     {
+      const int current_severity=RiskStateSeverity(runtime.state);
+      const int candidate_severity=RiskStateSeverity(candidate);
+      if(candidate=="RISK_STOP_REQUIRED")
+        {
+         SetRuntimeState(runtime,candidate,subject,reason);
+         return(runtime.state);
+        }
+
+      if(candidate_severity>current_severity)
+        {
+         runtime.recovery_confirmation_count=0;
+         runtime.unsafe_confirmation_count++;
+         if(runtime.unsafe_confirmation_count>=m_unsafe_confirmation_count)
+            SetRuntimeState(runtime,candidate,subject,reason);
+         return(runtime.state);
+        }
+
+      if(candidate_severity<current_severity)
+        {
+         runtime.unsafe_confirmation_count=0;
+         runtime.recovery_confirmation_count++;
+         if(runtime.recovery_confirmation_count>=m_recovery_confirmation_count &&
+            IsRiskCooldownComplete(runtime))
+           {
+            const string recovered_state=RiskStateFromSeverity(current_severity-1);
+            SetRuntimeState(runtime,recovered_state,subject,
+                            "Risk recovery was confirmed and improved by one state.");
+           }
+         return(runtime.state);
+        }
+
+      runtime.unsafe_confirmation_count=0;
+      runtime.recovery_confirmation_count=0;
+      return(runtime.state);
+     }
+
+   double CalculateRiskScore(const SRiskEnvironment &environment,const SRiskInput &source,
+                             const bool data_valid)
+     {
+      if(!data_valid)
+         return(100.0);
+
+      double volatility_risk=0.0;
+      if(environment.volatility_score>m_volatility_threshold)
+         volatility_risk=ClampPercent(100.0*(environment.volatility_score-
+                                      m_volatility_threshold)/
+                                      MathMax(1.0,100.0-m_volatility_threshold));
+      const double environment_confidence_risk=ClampPercent(100.0-
+                                                             environment.market_confidence);
+      const double ranking_confidence_risk=ClampPercent(100.0-
+                                                         source.pair_ranking_confidence);
+      double allocation_risk=0.0;
+      if(source.capital_allocation_percent>m_max_allocation_per_symbol)
+         allocation_risk=ClampPercent(100.0*(source.capital_allocation_percent-
+                                      m_max_allocation_per_symbol)/
+                                      MathMax(1.0,100.0-m_max_allocation_per_symbol));
+      const double strategy_confidence_risk=ClampPercent(100.0-
+                                                          source.strategy_selection_confidence);
+      const double standby_risk=ClampPercent(source.standby_escalation_score);
+      double regime_risk=0.0;
+      if(environment.market_state=="TRANSITION")
+         regime_risk=100.0;
+      else if(environment.market_state=="VOLATILE")
+         regime_risk=75.0;
+      const bool contradictory=((source.is_standby_active && source.are_new_entries_allowed) ||
+                                (source.is_capital_allocated &&
+                                 (!source.is_market_eligible || !source.is_pair_ranked)) ||
+                                !source.is_trading_style_valid ||
+                                !source.is_strategy_selection_valid ||
+                                (source.standby_recommended_next_state=="RISK_STOP" &&
+                                 source.are_new_entries_allowed));
+      const double contradiction_risk=(contradictory ? 100.0 : 0.0);
+      const double style_confidence_risk=ClampPercent(100.0-
+                                                       source.trading_style_confidence);
+      return(ClampPercent((0.15*volatility_risk)+
+                          (0.10*environment_confidence_risk)+
+                          (0.10*ranking_confidence_risk)+
+                          (0.10*allocation_risk)+
+                          (0.10*strategy_confidence_risk)+
+                          (0.15*standby_risk)+
+                          (0.10*regime_risk)+
+                          (0.10*contradiction_risk)+
+                          (0.10*style_confidence_risk)));
+     }
+
+   double CalculateRiskConfidence(const SRiskEnvironment &environment,
+                                  const SRiskInput &source,const bool data_valid)
+     {
+      if(!data_valid)
+         return(0.0);
+      double confidence=MathMin(environment.market_confidence,
+                                source.pair_ranking_confidence);
+      confidence=MathMin(confidence,source.strategy_selection_confidence);
+      confidence=MathMin(confidence,source.trading_style_confidence);
+      return(ClampPercent(confidence));
+     }
+
+   string CandidateState(const SRiskEnvironment &environment,const SRiskInput &source,
+                         const double score,const double confidence,const bool data_valid)
+     {
+      if(!data_valid || source.standby_state=="RISK_STOP_PENDING" ||
+         source.standby_recommended_next_state=="RISK_STOP" ||
+         score>=m_risk_stop_threshold)
+         return("RISK_STOP_REQUIRED");
+      if(source.standby_state=="ESCALATION_PENDING" ||
+         source.standby_recommended_next_state=="DYNAMIC_ZONE" ||
+         (source.is_capital_allocated && !source.are_new_entries_allowed) ||
+         score>=m_suspended_threshold)
+         return("SUSPENDED");
+      if(score>=m_reduced_threshold || confidence<m_minimum_confidence)
+         return("REDUCED");
+      if(score>=m_caution_threshold || environment.market_state=="TRANSITION")
+         return("CAUTION");
+      return("SAFE");
+     }
+
+   string RiskReason(const string state,const SRiskInput &source,const bool data_valid)
+     {
+      if(!data_valid)
+         return("Required risk records are invalid, unavailable, or stale.");
+      if(state=="RISK_STOP_REQUIRED")
+         return("Critical risk requires a future Risk Engine handoff without forced closure.");
+      if(state=="SUSPENDED" && source.standby_recommended_next_state=="DYNAMIC_ZONE")
+         return("Standby requested structural escalation and new entries remain blocked.");
+      if(state=="SUSPENDED")
+         return("Risk conditions require new-entry suspension.");
+      if(state=="REDUCED")
+         return("Risk conditions permit reduced recommended exposure only.");
+      if(state=="CAUTION")
+         return("Risk conditions permit cautious reduced exposure.");
+      return("Risk inputs support normal future-entry permission.");
+     }
+
+   void BuildSnapshot(const string final_state,const SRiskEnvironment &environment,
+                      const SRiskInput &source,const double score,const double confidence,
+                      const bool data_valid,SRiskSnapshot &snapshot)
+     {
+      snapshot.state=final_state;
+      snapshot.score=score;
+      snapshot.confidence=confidence;
+      snapshot.data_valid=data_valid;
+      snapshot.preserve_existing_positions=true;
+      snapshot.allocation_multiplier=AllocationMultiplier(final_state);
+      snapshot.is_risk_approved=(final_state=="SAFE" || final_state=="CAUTION" ||
+                                 final_state=="REDUCED");
+      snapshot.are_new_entries_risk_approved=(snapshot.is_risk_approved && data_valid &&
+                                              source.are_new_entries_allowed);
+      snapshot.escalation_required=(final_state=="RISK_STOP_REQUIRED" ||
+                                    source.standby_recommended_next_state=="DYNAMIC_ZONE");
+      if(final_state=="RISK_STOP_REQUIRED")
+         snapshot.action="REQUEST_RISK_STOP";
+      else if(source.standby_recommended_next_state=="DYNAMIC_ZONE")
+         snapshot.action="ESCALATE_DYNAMIC_ZONE";
+      else if(final_state=="SUSPENDED")
+         snapshot.action="BLOCK_NEW_ENTRIES";
+      else if(final_state=="CAUTION" || final_state=="REDUCED")
+         snapshot.action="ALLOW_REDUCED";
+      else
+         snapshot.action="ALLOW";
+      snapshot.reason=RiskReason(final_state,source,data_valid);
+      snapshot.updated_at=TimeCurrent();
+     }
+
+   bool PublishSnapshot(const SRiskSnapshot &snapshot)
+     {
+      if(m_data_bus==NULL)
+         return(false);
+      bool success=true;
+      if(!m_data_bus.SetSymbolText(FENX_DATABUS_NAMESPACE_RISK,snapshot.symbol,
+                                   FENX_DATABUS_FIELD_SYMBOL_RISK_STATE,snapshot.state)) success=false;
+      if(!m_data_bus.SetSymbolText(FENX_DATABUS_NAMESPACE_RISK,snapshot.symbol,
+                                   FENX_DATABUS_FIELD_RISK_ACTION,snapshot.action)) success=false;
+      if(!m_data_bus.SetSymbolText(FENX_DATABUS_NAMESPACE_RISK,snapshot.symbol,
+                                   FENX_DATABUS_FIELD_IS_RISK_APPROVED,
+                                   (snapshot.is_risk_approved ? "true" : "false"))) success=false;
       if(!m_data_bus.SetSymbolText(FENX_DATABUS_NAMESPACE_RISK,snapshot.symbol,
                                    FENX_DATABUS_FIELD_NEW_ENTRIES_RISK_APPROVED,
                                    (snapshot.are_new_entries_risk_approved ? "true" : "false"))) success=false;
@@ -764,12 +1153,12 @@ public:
       for(int index=0;index<symbol_count;index++)
         {
          ResetSnapshot(snapshots[index],m_symbols[index]);
-         SRiskInput input;
-         const bool input_available=ReadSymbolInput(m_symbols[index],input);
-         const bool input_fresh=(input_available && IsInputFresh(input));
+         SRiskInput source;
+         const bool input_available=ReadSymbolInput(m_symbols[index],source);
+         const bool input_fresh=(input_available && IsInputFresh(source));
          const bool data_valid=(upstream_valid && input_available && input_fresh &&
-                                input.is_trading_style_valid && input.is_strategy_selection_valid &&
-                                input.standby_data_valid);
+                                source.is_trading_style_valid && source.is_strategy_selection_valid &&
+                                source.standby_data_valid);
          if(!input_available)
            {
             SetRuntimeState(m_runtime[index],"RISK_STOP_REQUIRED",m_symbols[index],
@@ -783,23 +1172,23 @@ public:
             continue;
            }
 
-         const double score=CalculateRiskScore(environment,input,data_valid);
-         const double confidence=CalculateRiskConfidence(environment,input,data_valid);
-         const string candidate=CandidateState(environment,input,score,confidence,data_valid);
+         const double score=CalculateRiskScore(environment,source,data_valid);
+         const double confidence=CalculateRiskConfidence(environment,source,data_valid);
+         const string candidate=CandidateState(environment,source,score,confidence,data_valid);
          const string final_state=ApplyHysteresis(m_runtime[index],candidate,m_symbols[index],
-                                                  RiskReason(candidate,input,data_valid));
-         BuildSnapshot(final_state,environment,input,score,confidence,data_valid,snapshots[index]);
+                                                  RiskReason(candidate,source,data_valid));
+         BuildSnapshot(final_state,environment,source,score,confidence,data_valid,snapshots[index]);
          if(!data_valid)
             invalid_count++;
          if(!data_valid)
             all_data_valid=false;
-         if(input.is_standby_active)
+         if(source.is_standby_active)
             standby_count++;
-         if(input.standby_recommended_next_state=="DYNAMIC_ZONE" ||
-            input.standby_escalation_score>=m_standby_escalation_threshold)
+         if(source.standby_recommended_next_state=="DYNAMIC_ZONE" ||
+            source.standby_escalation_score>=m_standby_escalation_threshold)
             escalation_count++;
-         if(input.is_standby_active || input.standby_recommended_next_state=="DYNAMIC_ZONE" ||
-            input.standby_escalation_score>=m_standby_escalation_threshold)
+         if(source.is_standby_active || source.standby_recommended_next_state=="DYNAMIC_ZONE" ||
+            source.standby_escalation_score>=m_standby_escalation_threshold)
             standby_or_escalation_count++;
          if(snapshots[index].state=="SUSPENDED")
             suspended_count++;
@@ -814,7 +1203,7 @@ public:
             has_dynamic_escalation=true;
          if(snapshots[index].action=="REQUEST_RISK_STOP")
             has_entry_block=true;
-         largest_allocation=MathMax(largest_allocation,input.capital_allocation_percent);
+         largest_allocation=MathMax(largest_allocation,source.capital_allocation_percent);
          confidence_total+=snapshots[index].confidence;
         }
 

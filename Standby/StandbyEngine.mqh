@@ -265,39 +265,67 @@ private:
       if(m_data_bus==NULL)
          return(false);
 
-      if(!m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_STATE,
-                                environment.market_state) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_CONFIDENCE,
-                     environment.market_confidence) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_ATR,environment.atr) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_UPPER,environment.range_upper) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_LOWER,environment.range_lower) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_WIDTH_POINTS,
-                     environment.range_width_points) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_POSITION,
-                     environment.range_position) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_SCORE,environment.range_score) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_IS_RANGE,environment.is_range) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,
-                      environment.range_data_valid) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_SCORE,environment.trend_score) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_STRENGTH,
-                     environment.trend_strength) ||
+      string market_state="";
+      double market_confidence=0.0;
+      double atr=0.0;
+      double range_upper=0.0;
+      double range_lower=0.0;
+      double range_width_points=0.0;
+      double range_position=0.0;
+      double range_score=0.0;
+      bool is_range=false;
+      bool range_data_valid=false;
+      double trend_score=0.0;
+      double trend_strength=0.0;
+      string trend_direction="";
+      bool trend_data_valid=false;
+      double volatility_score=0.0;
+      datetime market_updated_at=0;
+      datetime range_updated_at=0;
+      datetime range_closed_bar_time=0;
+      datetime trend_updated_at=0;
+      if(!m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_STATE,market_state) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_CONFIDENCE,market_confidence) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_ATR,atr) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_UPPER,range_upper) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_LOWER,range_lower) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_WIDTH_POINTS,range_width_points) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_POSITION,range_position) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_SCORE,range_score) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_IS_RANGE,is_range) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,range_data_valid) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_SCORE,trend_score) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_TREND_STRENGTH,trend_strength) ||
          !m_data_bus.TryGetText(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DIRECTION,
-                                environment.trend_direction) ||
-         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID,
-                      environment.trend_data_valid) ||
-         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE,
-                     environment.volatility_score) ||
-         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_UPDATED_AT,
-                        environment.market_updated_at) ||
-         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_UPDATED_AT,
-                        environment.range_updated_at) ||
+                                trend_direction) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_TREND_DATA_VALID,trend_data_valid) ||
+         !ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_VOLATILITY_SCORE,volatility_score) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_MARKET_UPDATED_AT,market_updated_at) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_UPDATED_AT,range_updated_at) ||
          !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_CLOSED_BAR_TIME,
-                        environment.range_closed_bar_time) ||
-         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_TREND_UPDATED_AT,
-                        environment.trend_updated_at))
+                        range_closed_bar_time) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_ENVIRONMENT_TREND_UPDATED_AT,trend_updated_at))
          return(false);
+
+      environment.market_state=market_state;
+      environment.market_confidence=market_confidence;
+      environment.atr=atr;
+      environment.range_upper=range_upper;
+      environment.range_lower=range_lower;
+      environment.range_width_points=range_width_points;
+      environment.range_position=range_position;
+      environment.range_score=range_score;
+      environment.is_range=is_range;
+      environment.range_data_valid=range_data_valid;
+      environment.trend_score=trend_score;
+      environment.trend_strength=trend_strength;
+      environment.trend_direction=trend_direction;
+      environment.trend_data_valid=trend_data_valid;
+      environment.volatility_score=volatility_score;
+      environment.market_updated_at=market_updated_at;
+      environment.range_updated_at=range_updated_at;
+      environment.range_closed_bar_time=range_closed_bar_time;
+      environment.trend_updated_at=trend_updated_at;
 
       return((environment.market_state=="RANGING" || environment.market_state=="TRENDING" ||
               environment.market_state=="VOLATILE" || environment.market_state=="TRANSITION") &&
@@ -313,21 +341,35 @@ private:
 
    bool ReadPipeline(SStandbyPipeline &pipeline)
      {
-      return(ReadBoolean(FENX_DATABUS_KEY_PAIR_RANKING_DATA_VALID,
-                         pipeline.pair_ranking_valid) &&
-             ReadTimestamp(FENX_DATABUS_KEY_PAIR_RANKING_UPDATED_AT,
-                           pipeline.pair_ranking_updated_at) &&
-             ReadBoolean(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_DATA_VALID,
-                         pipeline.allocation_valid) &&
-             ReadTimestamp(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UPDATED_AT,
-                           pipeline.allocation_updated_at) &&
-             ReadBoolean(FENX_DATABUS_KEY_TRADING_STYLE_DATA_VALID,pipeline.style_valid) &&
-             ReadTimestamp(FENX_DATABUS_KEY_TRADING_STYLE_UPDATED_AT,
-                           pipeline.style_updated_at) &&
-             ReadBoolean(FENX_DATABUS_KEY_STRATEGY_SELECTION_DATA_VALID,
-                         pipeline.strategy_valid) &&
-             ReadTimestamp(FENX_DATABUS_KEY_STRATEGY_SELECTION_UPDATED_AT,
-                           pipeline.strategy_updated_at));
+      bool pair_ranking_valid=false;
+      datetime pair_ranking_updated_at=0;
+      bool allocation_valid=false;
+      datetime allocation_updated_at=0;
+      bool style_valid=false;
+      datetime style_updated_at=0;
+      bool strategy_valid=false;
+      datetime strategy_updated_at=0;
+      if(!ReadBoolean(FENX_DATABUS_KEY_PAIR_RANKING_DATA_VALID,pair_ranking_valid) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_PAIR_RANKING_UPDATED_AT,pair_ranking_updated_at) ||
+         !ReadBoolean(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_DATA_VALID,allocation_valid) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_CAPITAL_ALLOCATION_UPDATED_AT,
+                        allocation_updated_at) ||
+         !ReadBoolean(FENX_DATABUS_KEY_TRADING_STYLE_DATA_VALID,style_valid) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_TRADING_STYLE_UPDATED_AT,style_updated_at) ||
+         !ReadBoolean(FENX_DATABUS_KEY_STRATEGY_SELECTION_DATA_VALID,strategy_valid) ||
+         !ReadTimestamp(FENX_DATABUS_KEY_STRATEGY_SELECTION_UPDATED_AT,
+                        strategy_updated_at))
+         return(false);
+
+      pipeline.pair_ranking_valid=pair_ranking_valid;
+      pipeline.pair_ranking_updated_at=pair_ranking_updated_at;
+      pipeline.allocation_valid=allocation_valid;
+      pipeline.allocation_updated_at=allocation_updated_at;
+      pipeline.style_valid=style_valid;
+      pipeline.style_updated_at=style_updated_at;
+      pipeline.strategy_valid=strategy_valid;
+      pipeline.strategy_updated_at=strategy_updated_at;
+      return(true);
      }
 
    bool ReadSymbolBoolean(const string name_space,const string symbol,const string field,
@@ -372,70 +414,101 @@ private:
              ReadTimestampText(text,value));
      }
 
-   bool ReadSymbolInput(const string symbol,SStandbyInput &input)
+   bool ReadSymbolInput(const string symbol,SStandbyInput &source)
      {
       if(m_data_bus==NULL)
          return(false);
 
-      input.symbol=symbol;
+      bool is_market_eligible=false;
+      datetime market_selection_updated_at=0;
+      bool is_pair_ranked=false;
+      int pair_rank=0;
+      double pair_ranking_score=0.0;
+      datetime pair_ranking_updated_at=0;
+      bool is_capital_allocated=false;
+      double capital_allocation_percent=0.0;
+      datetime capital_allocation_updated_at=0;
+      string trading_style="";
+      bool is_trading_style_valid=false;
+      datetime trading_style_updated_at=0;
+      string selected_strategy="";
+      double strategy_selection_confidence=0.0;
+      bool is_strategy_selection_valid=false;
+      datetime strategy_selection_updated_at=0;
       if(!ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                             FENX_DATABUS_FIELD_MARKET_SELECTION_IS_ELIGIBLE,
-                            input.is_market_eligible) ||
+                            is_market_eligible) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_MARKET_SELECTION,symbol,
                               FENX_DATABUS_FIELD_MARKET_SELECTION_UPDATED_AT,
-                              input.market_selection_updated_at) ||
+                              market_selection_updated_at) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
-                            FENX_DATABUS_FIELD_PAIR_RANKING_IS_RANKED,
-                            input.is_pair_ranked) ||
+                            FENX_DATABUS_FIELD_PAIR_RANKING_IS_RANKED,is_pair_ranked) ||
          !ReadSymbolInteger(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
-                            FENX_DATABUS_FIELD_PAIR_RANKING_RANK,input.pair_rank) ||
+                            FENX_DATABUS_FIELD_PAIR_RANKING_RANK,pair_rank) ||
          !ReadSymbolDouble(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
-                           FENX_DATABUS_FIELD_PAIR_RANKING_SCORE,
-                           input.pair_ranking_score) ||
+                           FENX_DATABUS_FIELD_PAIR_RANKING_SCORE,pair_ranking_score) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_PAIR_RANKING,symbol,
                               FENX_DATABUS_FIELD_PAIR_RANKING_UPDATED_AT,
-                              input.pair_ranking_updated_at) ||
+                              pair_ranking_updated_at) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_CAPITAL_ALLOCATION,symbol,
                             FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_IS_ALLOCATED,
-                            input.is_capital_allocated) ||
+                            is_capital_allocated) ||
          !ReadSymbolDouble(FENX_DATABUS_NAMESPACE_CAPITAL_ALLOCATION,symbol,
                            FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_PERCENT,
-                           input.capital_allocation_percent) ||
+                           capital_allocation_percent) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_CAPITAL_ALLOCATION,symbol,
                               FENX_DATABUS_FIELD_CAPITAL_ALLOCATION_UPDATED_AT,
-                              input.capital_allocation_updated_at) ||
+                              capital_allocation_updated_at) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
-                                      FENX_DATABUS_FIELD_TRADING_STYLE,input.trading_style) ||
+                                      FENX_DATABUS_FIELD_TRADING_STYLE,trading_style) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
                             FENX_DATABUS_FIELD_TRADING_STYLE_IS_VALID,
-                            input.is_trading_style_valid) ||
+                            is_trading_style_valid) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_TRADING_STYLE,symbol,
                               FENX_DATABUS_FIELD_TRADING_STYLE_UPDATED_AT,
-                              input.trading_style_updated_at) ||
+                              trading_style_updated_at) ||
          !m_data_bus.TryGetSymbolText(FENX_DATABUS_NAMESPACE_STRATEGY_SELECTION,symbol,
                                       FENX_DATABUS_FIELD_SELECTED_STRATEGY,
-                                      input.selected_strategy) ||
+                                      selected_strategy) ||
          !ReadSymbolDouble(FENX_DATABUS_NAMESPACE_STRATEGY_SELECTION,symbol,
                            FENX_DATABUS_FIELD_STRATEGY_SELECTION_CONFIDENCE,
-                           input.strategy_selection_confidence) ||
+                           strategy_selection_confidence) ||
          !ReadSymbolBoolean(FENX_DATABUS_NAMESPACE_STRATEGY_SELECTION,symbol,
                             FENX_DATABUS_FIELD_STRATEGY_SELECTION_IS_VALID,
-                            input.is_strategy_selection_valid) ||
+                            is_strategy_selection_valid) ||
          !ReadSymbolTimestamp(FENX_DATABUS_NAMESPACE_STRATEGY_SELECTION,symbol,
                               FENX_DATABUS_FIELD_STRATEGY_SELECTION_UPDATED_AT,
-                              input.strategy_selection_updated_at))
+                              strategy_selection_updated_at))
          return(false);
 
-      return(input.pair_rank>=0 && input.pair_ranking_score>=0.0 &&
-             input.pair_ranking_score<=100.0 && input.capital_allocation_percent>=0.0 &&
-             input.capital_allocation_percent<=100.0 &&
-             input.strategy_selection_confidence>=0.0 &&
-             input.strategy_selection_confidence<=100.0 &&
-             (input.trading_style=="RANGE" || input.trading_style=="TREND" ||
-              input.trading_style=="HYBRID" || input.trading_style=="STANDBY") &&
-             (input.selected_strategy=="RANGE_MEAN_REVERSION" ||
-              input.selected_strategy=="TREND_FOLLOWING" || input.selected_strategy=="BREAKOUT" ||
-              input.selected_strategy=="HYBRID_ADAPTIVE" || input.selected_strategy=="NO_TRADE"));
+      source.symbol=symbol;
+      source.is_market_eligible=is_market_eligible;
+      source.market_selection_updated_at=market_selection_updated_at;
+      source.is_pair_ranked=is_pair_ranked;
+      source.pair_rank=pair_rank;
+      source.pair_ranking_score=pair_ranking_score;
+      source.pair_ranking_updated_at=pair_ranking_updated_at;
+      source.is_capital_allocated=is_capital_allocated;
+      source.capital_allocation_percent=capital_allocation_percent;
+      source.capital_allocation_updated_at=capital_allocation_updated_at;
+      source.trading_style=trading_style;
+      source.is_trading_style_valid=is_trading_style_valid;
+      source.trading_style_updated_at=trading_style_updated_at;
+      source.selected_strategy=selected_strategy;
+      source.strategy_selection_confidence=strategy_selection_confidence;
+      source.is_strategy_selection_valid=is_strategy_selection_valid;
+      source.strategy_selection_updated_at=strategy_selection_updated_at;
+
+      return(source.pair_rank>=0 && source.pair_ranking_score>=0.0 &&
+             source.pair_ranking_score<=100.0 && source.capital_allocation_percent>=0.0 &&
+             source.capital_allocation_percent<=100.0 &&
+             source.strategy_selection_confidence>=0.0 &&
+             source.strategy_selection_confidence<=100.0 &&
+             (source.trading_style=="RANGE" || source.trading_style=="TREND" ||
+              source.trading_style=="HYBRID" || source.trading_style=="STANDBY") &&
+             (source.selected_strategy=="RANGE_MEAN_REVERSION" ||
+              source.selected_strategy=="TREND_FOLLOWING" || source.selected_strategy=="BREAKOUT" ||
+              source.selected_strategy=="HYBRID_ADAPTIVE" || source.selected_strategy=="NO_TRADE"));
      }
 
    bool IsTimestampFresh(const datetime updated_at,const int limit_seconds)
@@ -461,13 +534,13 @@ private:
              IsTimestampFresh(pipeline.strategy_updated_at,limit_seconds));
      }
 
-   bool IsInputFresh(const SStandbyInput &input,const int limit_seconds)
+   bool IsInputFresh(const SStandbyInput &source,const int limit_seconds)
      {
-      return(IsTimestampFresh(input.market_selection_updated_at,limit_seconds) &&
-             IsTimestampFresh(input.pair_ranking_updated_at,limit_seconds) &&
-             IsTimestampFresh(input.capital_allocation_updated_at,limit_seconds) &&
-             IsTimestampFresh(input.trading_style_updated_at,limit_seconds) &&
-             IsTimestampFresh(input.strategy_selection_updated_at,limit_seconds));
+      return(IsTimestampFresh(source.market_selection_updated_at,limit_seconds) &&
+             IsTimestampFresh(source.pair_ranking_updated_at,limit_seconds) &&
+             IsTimestampFresh(source.capital_allocation_updated_at,limit_seconds) &&
+             IsTimestampFresh(source.trading_style_updated_at,limit_seconds) &&
+             IsTimestampFresh(source.strategy_selection_updated_at,limit_seconds));
      }
 
    bool LoadSymbols(CParameterManager &parameters)
@@ -480,9 +553,15 @@ private:
 
       for(int index=0;index<symbol_count;index++)
         {
-         if(!parameters.TryGetMarketSelectionSymbol(index,m_symbols[index]) ||
-            StringLen(m_symbols[index])==0)
+         string configured_symbol="";
+
+         if(!parameters.TryGetMarketSelectionSymbol(index,configured_symbol) ||
+
+            StringLen(configured_symbol)==0)
+
             return(false);
+
+         m_symbols[index]=configured_symbol;
          ResetRuntime(m_runtime[index]);
         }
       return(true);
@@ -490,7 +569,200 @@ private:
 
    bool IsNewConfirmationBar(SStandbyRuntime &runtime,const datetime closed_bar_time)
      {
-      if(closed_bar_time<=0 || closed_bar_time<=…2628 tokens truncated…G",symbol,
+      if(closed_bar_time<=0 || closed_bar_time<=runtime.last_confirmation_bar_time)
+         return(false);
+
+      runtime.last_confirmation_bar_time=closed_bar_time;
+      return(true);
+     }
+
+   bool IsCooldownComplete(const SStandbyRuntime &runtime)
+     {
+      if(runtime.state_changed_at<=0 || m_transition_cooldown_seconds<=0)
+         return(true);
+      const long elapsed_seconds=(long)(TimeCurrent()-runtime.state_changed_at);
+      return(elapsed_seconds>=m_transition_cooldown_seconds);
+     }
+
+   double BoundaryBufferRatio(const SStandbyEnvironment &environment)
+     {
+      if(environment.range_width_points<=0.0 ||
+         environment.range_upper<=environment.range_lower)
+         return(0.5);
+
+      const double point_size=(environment.range_upper-environment.range_lower)/
+                              environment.range_width_points;
+      if(point_size<=0.0)
+         return(0.5);
+
+      const double atr_points=environment.atr/point_size;
+      const double buffer_points=MathMax(m_breakout_distance_points,
+                                         m_breakout_distance_atr_multiple*atr_points);
+      return(MathMax(0.0,MathMin(0.5,buffer_points/environment.range_width_points)));
+     }
+
+   bool IsBoundaryBreach(const SStandbyEnvironment &environment)
+     {
+      const double buffer_ratio=BoundaryBufferRatio(environment);
+      return(environment.range_position<=buffer_ratio ||
+             environment.range_position>=1.0-buffer_ratio);
+     }
+
+   double CalculateStandbyConfidence(const SStandbyEnvironment &environment,
+                                     const SStandbyInput &source,const bool data_fresh)
+     {
+      double confidence=MathMin(environment.market_confidence,
+                                source.strategy_selection_confidence);
+      confidence=MathMin(confidence,source.pair_ranking_score);
+      if(environment.is_range)
+         confidence=MathMin(confidence,environment.range_score);
+      if(!data_fresh)
+         confidence*=0.75;
+      return(ClampPercent(confidence));
+     }
+
+   double CalculateEscalationScore(const SStandbyRuntime &runtime,
+                                   const SStandbyEnvironment &environment,
+                                   const bool boundary_breach)
+     {
+      double duration_score=0.0;
+      if(runtime.entered_at>0 && m_max_duration_seconds>0)
+        {
+         const long duration_seconds=(long)(TimeCurrent()-runtime.entered_at);
+         duration_score=ClampPercent(100.0*(double)MathMax(0,duration_seconds)/
+                                     m_max_duration_seconds);
+        }
+
+      const double confidence_score=ClampPercent(100.0-environment.market_confidence);
+      const double boundary_score=(boundary_breach ? 50.0 : 0.0);
+      return(ClampPercent(MathMax(duration_score,
+                          MathMax(environment.trend_strength,
+                          MathMax(environment.volatility_score,
+                          MathMax(confidence_score,boundary_score))))));
+     }
+
+   void SetRuntimeState(SStandbyRuntime &runtime,const string state,const string symbol,
+                        const string reason)
+     {
+      if(runtime.state==state)
+         return;
+
+      const string previous_state=runtime.state;
+      const datetime now=TimeCurrent();
+      runtime.state=state;
+      runtime.state_changed_at=now;
+      runtime.entry_confirmation_count=0;
+      runtime.recovery_confirmation_count=0;
+
+      if(state=="NORMAL")
+        {
+         runtime.entered_at=0;
+         runtime.duration_warning_logged=false;
+         runtime.critical_warning_logged=false;
+        }
+      else if(runtime.entered_at<=0)
+         runtime.entered_at=now;
+
+      if(state=="ESCALATION_PENDING" || state=="RISK_STOP_PENDING")
+         CLogger::Warning(StringFormat("StandbyEngine %s: %s -> %s. %s",
+                                      symbol,previous_state,state,reason));
+      else
+         CLogger::Info(StringFormat("StandbyEngine %s: %s -> %s. %s",
+                                   symbol,previous_state,state,reason));
+     }
+
+   void UpdateRuntime(SStandbyRuntime &runtime,const string symbol,
+                      const SStandbyEnvironment &environment,
+                      const SStandbyPipeline &pipeline,const SStandbyInput &source,
+                      const bool raw_data_available,const bool data_fresh,
+                      const bool within_grace,const bool data_valid)
+     {
+      const bool is_new_bar=IsNewConfirmationBar(runtime,environment.range_closed_bar_time);
+      const bool boundary_breach=IsBoundaryBreach(environment);
+      const double confidence=CalculateStandbyConfidence(environment,source,data_fresh);
+      const double escalation_score=CalculateEscalationScore(runtime,environment,
+                                                              boundary_breach);
+      const long duration_seconds=(runtime.entered_at>0 ?
+                                   (long)(TimeCurrent()-runtime.entered_at) : 0);
+      const bool pipeline_degraded=(!pipeline.pair_ranking_valid || !pipeline.allocation_valid ||
+                                    !pipeline.style_valid || !pipeline.strategy_valid);
+      const bool recommendation_blocked=(!source.is_market_eligible || !source.is_pair_ranked ||
+                                         !source.is_trading_style_valid ||
+                                         !source.is_strategy_selection_valid ||
+                                         source.trading_style=="STANDBY" ||
+                                         source.selected_strategy=="NO_TRADE");
+      const bool severe_volatility=(environment.volatility_score>=
+                                     MathMin(100.0,m_volatility_escalation_threshold+10.0));
+      const bool severe_condition=(!raw_data_available || !within_grace ||
+                                   severe_volatility ||
+                                   (data_fresh &&
+                                    confidence<=m_confidence_failure_threshold));
+      const bool entry_condition=(boundary_breach ||
+                                  environment.market_state=="TRANSITION" ||
+                                  pipeline_degraded || recommendation_blocked ||
+                                  !data_fresh ||
+                                  confidence<m_confidence_recovery_threshold);
+      const bool escalation_condition=(duration_seconds>=m_max_duration_seconds ||
+                                       environment.trend_strength>=
+                                          m_trend_escalation_threshold ||
+                                       environment.volatility_score>=
+                                          m_volatility_escalation_threshold ||
+                                       escalation_score>=m_trend_escalation_threshold);
+      const bool recovery_condition=(data_valid && data_fresh && environment.is_range &&
+                                     environment.range_data_valid &&
+                                     environment.trend_data_valid &&
+                                     environment.range_score>=m_min_range_recovery_score &&
+                                     confidence>=m_confidence_recovery_threshold &&
+                                     !boundary_breach &&
+                                     environment.trend_strength<
+                                        m_trend_escalation_threshold &&
+                                     environment.volatility_score<
+                                        m_volatility_escalation_threshold &&
+                                     !recommendation_blocked);
+
+      if(runtime.state=="NORMAL")
+        {
+         if(severe_condition)
+            SetRuntimeState(runtime,"RISK_STOP_PENDING",symbol,
+                            "Critical data loss, volatility, or confidence requires risk review.");
+         else if(entry_condition)
+           {
+            SetRuntimeState(runtime,"ENTERING_STANDBY",symbol,
+                            "A temporary protective condition requires confirmation.");
+            if(is_new_bar)
+               runtime.entry_confirmation_count++;
+            if(runtime.entry_confirmation_count>=m_entry_confirmation_bars)
+               SetRuntimeState(runtime,"STANDBY",symbol,
+                               "Standby entry persisted across completed-bar confirmations.");
+           }
+         return;
+        }
+
+      if(runtime.state=="ENTERING_STANDBY")
+        {
+         if(severe_condition)
+            SetRuntimeState(runtime,"RISK_STOP_PENDING",symbol,
+                            "Entry-confirmation data became critically unsafe.");
+         else if(!entry_condition)
+            SetRuntimeState(runtime,"NORMAL",symbol,
+                            "Temporary standby condition cleared before confirmation.");
+         else if(is_new_bar)
+           {
+            runtime.entry_confirmation_count++;
+            if(runtime.entry_confirmation_count>=m_entry_confirmation_bars)
+               SetRuntimeState(runtime,"STANDBY",symbol,
+                               "Standby entry persisted across completed-bar confirmations.");
+           }
+         return;
+        }
+
+      if(runtime.state=="STANDBY")
+        {
+         if(severe_condition)
+            SetRuntimeState(runtime,"RISK_STOP_PENDING",symbol,
+                            "Standby conditions became critically unsafe.");
+         else if(escalation_condition)
+            SetRuntimeState(runtime,"ESCALATION_PENDING",symbol,
                             "Duration, trend, volatility, or confidence indicates structural change.");
          else if(recovery_condition && IsCooldownComplete(runtime))
            {
@@ -557,7 +829,7 @@ private:
      }
 
    void BuildSnapshot(const SStandbyRuntime &runtime,const SStandbyEnvironment &environment,
-                      const SStandbyInput &input,const bool is_participant,const bool data_valid,
+                      const SStandbyInput &source,const bool is_participant,const bool data_valid,
                       const bool data_fresh,SStandbySnapshot &snapshot)
      {
       snapshot.state=runtime.state;
@@ -566,17 +838,17 @@ private:
       snapshot.entered_at=(snapshot.is_active ? runtime.entered_at : 0);
       if(snapshot.entered_at>0)
          snapshot.duration_seconds=MathMax(0,(long)(TimeCurrent()-snapshot.entered_at));
-      snapshot.confidence=CalculateStandbyConfidence(environment,input,data_fresh);
+      snapshot.confidence=CalculateStandbyConfidence(environment,source,data_fresh);
       snapshot.escalation_score=CalculateEscalationScore(runtime,environment,
-                                                          IsBoundaryBreach(environment),data_valid);
+                                                          IsBoundaryBreach(environment));
       snapshot.recommended_next_state=RecommendedNextState(runtime.state);
       snapshot.is_data_valid=data_valid;
       snapshot.are_new_entries_allowed=(runtime.state=="NORMAL" && is_participant && data_valid &&
-                                        input.is_market_eligible && input.is_pair_ranked &&
-                                        input.is_trading_style_valid &&
-                                        input.is_strategy_selection_valid &&
-                                        input.trading_style!="STANDBY" &&
-                                        input.selected_strategy!="NO_TRADE");
+                                        source.is_market_eligible && source.is_pair_ranked &&
+                                        source.is_trading_style_valid &&
+                                        source.is_strategy_selection_valid &&
+                                        source.trading_style!="STANDBY" &&
+                                        source.selected_strategy!="NO_TRADE");
       if(runtime.state=="RECOVERY_PENDING")
          snapshot.recovery_progress=ClampPercent(100.0*runtime.recovery_confirmation_count/
                                                   MathMax(1,m_recovery_confirmation_bars));
@@ -799,12 +1071,12 @@ public:
       for(int index=0;index<symbol_count;index++)
         {
          ResetSnapshot(snapshots[index],m_symbols[index]);
-         SStandbyInput input;
-         const bool input_available=ReadSymbolInput(m_symbols[index],input);
+         SStandbyInput source;
+         const bool input_available=ReadSymbolInput(m_symbols[index],source);
          const bool input_fresh=(input_available &&
-                                 IsInputFresh(input,m_base_stale_data_limit_seconds));
+                                 IsInputFresh(source,m_base_stale_data_limit_seconds));
          const bool input_within_grace=(input_available &&
-                                        IsInputFresh(input,m_base_stale_data_limit_seconds+
+                                        IsInputFresh(source,m_base_stale_data_limit_seconds+
                                         m_stale_data_grace_seconds));
          const bool raw_data_available=(environment_available && pipeline_available && input_available);
          const bool data_fresh=(environment_fresh && pipeline_fresh && input_fresh);
@@ -813,11 +1085,11 @@ public:
          const bool data_valid=(data_fresh && environment.range_data_valid &&
                                 environment.trend_data_valid && pipeline.pair_ranking_valid &&
                                 pipeline.allocation_valid && pipeline.style_valid &&
-                                pipeline.strategy_valid && input.is_market_eligible &&
-                                input.is_pair_ranked && input.is_trading_style_valid &&
-                                input.is_strategy_selection_valid);
-         const bool is_participant=(input_available && input.is_capital_allocated &&
-                                    input.capital_allocation_percent>0.0);
+                                pipeline.strategy_valid && source.is_market_eligible &&
+                                source.is_pair_ranked && source.is_trading_style_valid &&
+                                source.is_strategy_selection_valid);
+         const bool is_participant=(input_available && source.is_capital_allocated &&
+                                    source.capital_allocation_percent>0.0);
 
          if(!input_available)
            {
@@ -828,12 +1100,12 @@ public:
            }
 
          if(is_participant)
-            UpdateRuntime(m_runtime[index],m_symbols[index],environment,pipeline,input,
+            UpdateRuntime(m_runtime[index],m_symbols[index],environment,pipeline,source,
                           raw_data_available,data_fresh,within_grace,data_valid);
          else
             ResetRuntime(m_runtime[index]);
 
-         BuildSnapshot(m_runtime[index],environment,input,is_participant,data_valid,
+         BuildSnapshot(m_runtime[index],environment,source,is_participant,data_valid,
                        data_fresh,snapshots[index]);
          if(!snapshots[index].is_data_valid)
             all_data_valid=false;
