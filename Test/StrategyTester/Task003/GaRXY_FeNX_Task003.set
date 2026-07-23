@@ -1,0 +1,24 @@
+; Task #003 validation-only inputs. These settings intentionally relax
+; confidence thresholds to exercise the existing execution pipeline.
+InpExecutionEnabled=true||false||0||true||N
+InpExecutionSymbol=USDJPY
+InpExecutionMagicNumber=93095||93095||1||930950||N
+InpExecutionFixedLot=0.01||0.01||0.001000||0.100000||N
+InpExecutionMaximumSpreadPoints=100.0||100.0||10.000000||500.000000||N
+InpExecutionEntryBoundaryDistancePoints=200.0||200.0||20.000000||1000.000000||N
+InpExecutionEntryBoundaryDistanceAtrRatio=1.0||1.0||0.100000||2.000000||N
+InpExecutionExitMode=FIXED_POINTS
+InpExecutionFixedTakeProfitPoints=1000.0||1000.0||100.000000||5000.000000||N
+InpExecutionFixedStopLossPoints=1000.0||1000.0||100.000000||5000.000000||N
+InpExecutionRangeStopBufferPoints=10.0||10.0||1.000000||100.000000||N
+InpExecutionMinimumRangeScore=0.0||0.0||1.000000||100.000000||N
+InpExecutionMinimumStrategyConfidence=0.0||0.0||1.000000||100.000000||N
+InpExecutionMinimumRiskConfidence=0.0||0.0||1.000000||100.000000||N
+InpExecutionOrderCooldownSeconds=0||0||1||600||N
+InpExecutionOneOrderPerBar=true||false||0||true||N
+InpExecutionMaximumOpenPositionsPerSymbol=1||1||1||10||N
+InpExecutionAllowBuy=true||false||0||true||N
+InpExecutionAllowSell=true||false||0||true||N
+InpExecutionMaximumSlippagePoints=20||20||1||100||N
+InpExecutionTransientRetryLimit=1||1||1||10||N
+InpExecutionTradeComment=GaRXY_FeNX_Task003
