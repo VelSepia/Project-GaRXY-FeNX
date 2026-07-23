@@ -67,7 +67,10 @@ private:
    int                         m_successful_order_count;
    int                         m_failed_order_count;
    int                         m_blocked_order_count;
+   int                         m_successful_close_count;
+   int                         m_failed_close_count;
    int                         m_last_observed_fenx_position_count;
+   datetime                    m_last_processed_exit_bar_time;
    string                      m_last_blocked_reason;
 
    void ResetSnapshot(SExecutionSnapshot &snapshot)
@@ -167,6 +170,58 @@ private:
       else
          m_trade_logger.InfoOnce("A FeNX USDJPY position is open.");
       m_last_observed_fenx_position_count=current_count;
+     }
+
+   //--- Manages an existing FeNX position before evaluating any new-entry gate.
+   void ManageOpenPosition(const ulong position_ticket,
+                           const ENUM_POSITION_TYPE position_type,
+                           const datetime opened_at,SExecutionSnapshot &snapshot)
+     {
+      SRangeExitIntent exit_intent;
+      m_strategy.EvaluateExit(position_type,exit_intent);
+      snapshot.data_valid=(exit_intent.bar_time>0);
+      snapshot.gate_reason=exit_intent.reason;
+      if(exit_intent.bar_time<=0)
+         return;
+      if(exit_intent.bar_time<=opened_at)
+        {
+         snapshot.gate_reason="Awaiting a completed bar after the position entry.";
+         return;
+        }
+      if(!exit_intent.should_close)
+         return;
+      if(exit_intent.bar_time==m_last_processed_exit_bar_time)
+        {
+         snapshot.gate_reason="A close request was already attempted for this completed bar.";
+         return;
+        }
+
+      m_last_processed_exit_bar_time=exit_intent.bar_time;
+      m_last_order_request_at=TimeCurrent();
+      m_last_global_execution_at=m_last_order_request_at;
+      snapshot.last_order_request_at=m_last_order_request_at;
+      m_trade_logger.InfoOnce(StringFormat("Execution close request created for position %I64u.",
+                                           position_ticket));
+
+      SOrderExecutionResult close_result;
+      if(m_order_executor.ClosePosition(position_ticket,close_result))
+        {
+         m_successful_close_count++;
+         m_last_execution_result="CLOSE_ACCEPTED: "+close_result.description;
+         m_trade_logger.InfoOnce("Execution position close accepted: "+close_result.description);
+        }
+      else
+        {
+         m_failed_close_count++;
+         m_last_execution_result="CLOSE_REJECTED: "+close_result.description;
+         m_trade_logger.ErrorOnce("Execution position close rejected: "+close_result.description);
+        }
+      m_last_execution_retcode=close_result.retcode;
+      m_last_execution_deal_ticket=close_result.deal_ticket;
+      snapshot.last_execution_result=m_last_execution_result;
+      snapshot.last_execution_retcode=m_last_execution_retcode;
+      snapshot.last_execution_deal_ticket=m_last_execution_deal_ticket;
+      snapshot.gate_reason=exit_intent.reason;
      }
 
    bool PublishSnapshot(const SExecutionSnapshot &snapshot)
@@ -276,7 +331,10 @@ public:
       m_successful_order_count=0;
       m_failed_order_count=0;
       m_blocked_order_count=0;
+      m_successful_close_count=0;
+      m_failed_close_count=0;
       m_last_observed_fenx_position_count=0;
+      m_last_processed_exit_bar_time=0;
       m_last_blocked_reason="";
      }
 
@@ -340,15 +398,6 @@ public:
       SExecutionSnapshot snapshot;
       ResetSnapshot(snapshot);
       ObservePositionCount();
-      MqlTick tick;
-      double spread_points=-1.0;
-      string tick_reason="";
-      const bool tick_valid=GetTickAndSpread(tick,spread_points,tick_reason);
-      SExecutionGateResult gate_result;
-      m_gate.Evaluate((tick_valid ? spread_points : -1.0),gate_result);
-      snapshot.gate_allowed=gate_result.allowed;
-      snapshot.data_valid=gate_result.data_valid;
-      snapshot.gate_reason=gate_result.reason;
       snapshot.existing_position_detected=m_position_manager.HasAnyPositionOnSymbol();
 
       if(!m_execution_enabled)
@@ -359,6 +408,27 @@ public:
          PublishGlobal(snapshot);
          return;
         }
+
+      ulong position_ticket=0;
+      ENUM_POSITION_TYPE position_type=POSITION_TYPE_BUY;
+      datetime position_opened_at=0;
+      if(m_position_manager.TryGetFeNXPosition(position_ticket,position_type,position_opened_at))
+        {
+         ManageOpenPosition(position_ticket,position_type,position_opened_at,snapshot);
+         PublishSnapshot(snapshot);
+         PublishGlobal(snapshot);
+         return;
+        }
+
+      MqlTick tick;
+      double spread_points=-1.0;
+      string tick_reason="";
+      const bool tick_valid=GetTickAndSpread(tick,spread_points,tick_reason);
+      SExecutionGateResult gate_result;
+      m_gate.Evaluate((tick_valid ? spread_points : -1.0),gate_result);
+      snapshot.gate_allowed=gate_result.allowed;
+      snapshot.data_valid=gate_result.data_valid;
+      snapshot.gate_reason=gate_result.reason;
       if(!tick_valid)
         {
          RecordBlocked(tick_reason,snapshot);
@@ -472,8 +542,9 @@ public:
 
    virtual void       Shutdown(void)
      {
-      CLogger::Info(StringFormat("ExecutionEngine shutdown: %d successful, %d failed, %d blocked request(s).",
-                                 m_successful_order_count,m_failed_order_count,m_blocked_order_count));
+      CLogger::Info(StringFormat("ExecutionEngine shutdown: entries %d successful, %d failed, %d blocked; closes %d successful, %d failed.",
+                                 m_successful_order_count,m_failed_order_count,m_blocked_order_count,
+                                 m_successful_close_count,m_failed_close_count));
       m_duplicate_guard.Reset();
       CBaseEngine::Shutdown();
      }

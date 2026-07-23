@@ -195,6 +195,63 @@ public:
          result.description+=StringFormat(" (transient retries: %d)",retry_count);
       return(result.accepted);
      }
+
+   //--- Closes only the FeNX position selected by ticket and configured magic number.
+   bool              ClosePosition(const ulong position_ticket,SOrderExecutionResult &result)
+     {
+      result.accepted=false;
+      result.retcode=0;
+      result.deal_ticket=0;
+      result.description="";
+      result.executed_at=TimeCurrent();
+      if(position_ticket==0 || !PositionSelectByTicket(position_ticket))
+        {
+         result.description="Managed position is no longer available for closure.";
+         return(false);
+        }
+
+      const string symbol=PositionGetString(POSITION_SYMBOL);
+      if(PositionGetInteger(POSITION_MAGIC)!=m_magic_number || StringLen(symbol)==0)
+        {
+         result.description="Position closure rejected because ownership could not be verified.";
+         return(false);
+        }
+      if(!m_trade.SetTypeFillingBySymbol(symbol))
+        {
+         result.description="The position symbol does not expose a supported closing fill mode.";
+         return(false);
+        }
+
+      int retry_count=0;
+      while(true)
+        {
+         const bool sent=m_trade.PositionClose(position_ticket,(ulong)m_maximum_slippage_points);
+         result.retcode=(long)m_trade.ResultRetcode();
+         result.deal_ticket=(long)m_trade.ResultDeal();
+         result.description=m_trade.ResultRetcodeDescription();
+         const bool close_accepted=(sent && (result.retcode==TRADE_RETCODE_DONE ||
+                                             result.retcode==TRADE_RETCODE_PLACED ||
+                                             result.retcode==TRADE_RETCODE_DONE_PARTIAL));
+         const bool position_closed=!PositionSelectByTicket(position_ticket);
+         result.accepted=(close_accepted && position_closed);
+         if(result.accepted)
+            break;
+         if(retry_count>=m_transient_retry_limit ||
+            (!close_accepted && !IsTransientRetcode(result.retcode)))
+            break;
+         retry_count++;
+        }
+
+      if(StringLen(result.description)==0)
+         result.description=(result.accepted ? "Position close accepted." :
+                             "Position close rejected without a trade result description.");
+      if(!result.accepted && PositionSelectByTicket(position_ticket))
+         result.description+=" Managed position remains open.";
+      if(retry_count>0)
+         result.description+=StringFormat(" (close retries: %d)",retry_count);
+      result.executed_at=TimeCurrent();
+      return(result.accepted);
+     }
   };
 
 #endif // FENX_EXECUTION_ORDER_EXECUTOR_MQH

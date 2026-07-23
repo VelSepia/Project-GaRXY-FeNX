@@ -20,7 +20,7 @@ Use USDJPY on H1 first, with a quiet historical period that contains visible ran
 
 ## Expected behavior
 
-The EA should normally block most ticks until all upstream phases have valid fresh snapshots. An order can occur only after a completed candle closes near a detected range boundary and all final permissions agree. A close near RangeLower may create a BUY intent; a close near RangeUpper may create a SELL intent; midpoint or non-boundary closes produce no trade. Each order has a broker-validated SL and TP. No second FeNX order can open while a USDJPY position exists.
+The EA should normally block most ticks until all upstream phases have valid fresh snapshots. An order can occur only after a completed candle closes near a detected range boundary and all final permissions agree. A close near RangeLower may create a BUY intent; a close near RangeUpper may create a SELL intent; midpoint or non-boundary closes produce no entry. Each order has a broker-validated SL and TP. While a FeNX position is open, completed bars are evaluated before the new-entry gate: a BUY closes at or above the current range midpoint and a SELL closes at or below it. No second FeNX order can open while a USDJPY position exists.
 
 ## Logs and checks
 
@@ -29,11 +29,12 @@ Inspect tester logs for:
 - `ExecutionEngine initialized` and whether execution is enabled.
 - `Execution Gate blocked` reasons, especially stale data, Standby, or Risk blocks.
 - `Execution request created`, accepted, or rejected results and retcodes.
+- `Execution close request created`, accepted, or rejected results and retcodes.
 - duplicate/cooldown blocks and existing-position detection.
-- observed position-count changes after broker SL or TP closure.
+- observed position-count changes after midpoint, broker SL, or broker TP closure.
 
 Exercise BUY, SELL, midpoint no-trade, Standby block, Risk block, stale-data block, invalid SL/TP, reduced-risk volume, one-order-per-bar, and existing-position scenarios. Results should be deterministic for identical history, inputs, and tester conditions.
 
 ## Known limitations
 
-There is no native compile result included here, no dynamic position management, no close-on-Standby, no exact transaction-level SL/TP attribution, no symbol suffix support, and no account/margin-aware sizing. Only bounded transient price-response retries are supported. No grids, martingale, averaging, pyramiding, multi-strategy, or multi-symbol execution is implemented.
+There is no close-on-Standby, no exact transaction-level exit attribution, no symbol suffix support, and no account/margin-aware sizing. Midpoint exit decisions use completed bars and existing SL/TP protection remains active between evaluations. Only bounded transient price-response retries are supported. No grids, martingale, averaging, pyramiding, multi-strategy, or multi-symbol execution is implemented.

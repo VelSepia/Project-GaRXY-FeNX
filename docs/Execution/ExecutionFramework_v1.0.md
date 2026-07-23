@@ -2,21 +2,23 @@
 
 ## Scope
 
-Phase3-9.5 introduces the first deliberately constrained executable path for GaRXY FeNX. It can submit one market order for `USDJPY` only, using `RANGE_MEAN_REVERSION` only. It does not implement grids, averaging, martingale, pyramiding, multi-symbol execution, adaptive layers, or position-closing logic.
+Phase3-9.5 introduces the first deliberately constrained executable path for GaRXY FeNX. It can submit and close one market position for `USDJPY` only, using `RANGE_MEAN_REVERSION` only. It does not implement grids, averaging, martingale, pyramiding, multi-symbol execution, or adaptive layers.
 
 Execution is disabled by default. Enable `InpExecutionEnabled` only in Strategy Tester after compiling and reviewing the safety controls.
 
 ## Components and lifecycle
 
-`CExecutionEngine` is registered after `CStandbyEngine` and `CRiskEngine`. On each framework update the existing analysis, selection, allocation, style, strategy, Standby, and Risk engines publish their snapshots first. The execution engine then follows this sequence:
+`CExecutionEngine` is registered after `CStandbyEngine` and `CRiskEngine`. On each framework update the existing analysis, selection, allocation, style, strategy, Standby, and Risk engines publish their snapshots first. The execution engine first manages an existing FeNX position, or follows the entry sequence when no managed position exists:
 
-1. `CExecutionGate` verifies the StateManager state and all required, fresh DataBus permissions.
-2. `CRangeMeanReversionStrategy` inspects one completed candle and produces an intent only.
-3. `CPositionManager` blocks a new order when any USDJPY position exists.
-4. `CDuplicateOrderGuard` enforces cooldown, request identity, near-price, and optional one-order-per-bar rules.
-5. `COrderExecutor` is the sole component that may use `CTrade` to submit a BUY or SELL.
+1. `CPositionManager` identifies a FeNX position by symbol and magic number.
+2. For an existing position, `CRangeMeanReversionStrategy` emits a completed-bar exit intent when price reaches the current range midpoint, and `COrderExecutor` closes it.
+3. Without an existing FeNX position, `CExecutionGate` verifies the StateManager state and all required, fresh DataBus permissions.
+4. `CRangeMeanReversionStrategy` inspects one completed candle and produces an entry intent.
+5. `CPositionManager` blocks a new order when any USDJPY position exists.
+6. `CDuplicateOrderGuard` enforces cooldown, request identity, near-price, and optional one-order-per-bar rules.
+7. `COrderExecutor` is the sole component that may use `CTrade` to submit or close a position.
 
-`CTradeResultLogger` suppresses repeated identical messages while retaining initialization, blocks, requests, results, observed position changes, and shutdown totals.
+`CTradeResultLogger` suppresses repeated identical messages while retaining initialization, entry and close requests, results, observed position changes, and shutdown totals.
 
 ## Non-negotiable execution gate
 
@@ -37,7 +39,7 @@ The initial volume is the configurable fixed lot (default `0.01`), validated aga
 
 ## Position safety
 
-FeNX positions are identified by configured magic number and USDJPY symbol. The implementation permits at most one FeNX position. It also conservatively blocks a new entry if *any* USDJPY position exists, including a manual or another-EA position; it never modifies, closes, or otherwise interferes with that position. Standby and Risk blocks prevent new entries only and do not close existing positions.
+FeNX positions are identified by configured magic number and USDJPY symbol. The implementation permits at most one FeNX position. It also conservatively blocks a new entry if *any* USDJPY position exists, including a manual or another-EA position. Position closure verifies both the configured magic number and the selected ticket, so manual and other-EA positions are never modified. Standby and Risk blocks prevent new entries only and do not force-close existing positions.
 
 ## DataBus contract
 
@@ -55,4 +57,4 @@ All execution inputs begin with `InpExecution` in `GaRXY_FeNX.mq5` and are copie
 
 ## Explicit limitations
 
-Only `REQUOTE`, `PRICE_CHANGED`, and `PRICE_OFF` responses may be retried, up to `InpExecutionTransientRetryLimit` (default `1`) after a fresh stop-level validation. There is no trailing stop, break-even, partial close, manual exit, emergency liquidation, account/balance/margin calculation, or multi-symbol support. A position-count transition may indicate an SL/TP closure, but this version does not inspect trade transactions to attribute the exact close reason.
+Only `REQUOTE`, `PRICE_CHANGED`, and `PRICE_OFF` responses may be retried, up to `InpExecutionTransientRetryLimit` (default `1`) after a fresh stop-level validation. Close requests use the same bounded retry limit and must leave no managed position open before being recorded as successful. There is no trailing stop, break-even, partial close, manual exit, emergency liquidation, account/balance/margin calculation, or multi-symbol support. This version polls position state and does not inspect trade transactions to attribute an SL, TP, or midpoint close at transaction level.
