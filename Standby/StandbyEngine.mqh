@@ -317,7 +317,8 @@ private:
       environment.range_score=range_score;
       environment.is_range=is_range;
       environment.range_data_valid=range_data_valid;
-      environment.trend_score=trend_score;
+      // TrendScore is directional (-100..100); standby thresholds use magnitude.
+      environment.trend_score=MathAbs(trend_score);
       environment.trend_strength=trend_strength;
       environment.trend_direction=trend_direction;
       environment.trend_data_valid=trend_data_valid;

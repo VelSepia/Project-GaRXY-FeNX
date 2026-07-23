@@ -4,7 +4,7 @@
 #ifndef FENX_EXECUTION_POSITION_MANAGER_MQH
 #define FENX_EXECUTION_POSITION_MANAGER_MQH
 
-//--- Identifies FeNX positions without modifying or closing any position.
+//--- Identifies and reports FeNX positions without sending trade requests.
 class CPositionManager
   {
 private:
@@ -22,6 +22,30 @@ public:
      {
       m_symbol=symbol;
       m_magic_number=magic_number;
+     }
+
+   //--- Returns the single managed position expected by the execution contract.
+   bool              TryGetFeNXPosition(ulong &ticket,ENUM_POSITION_TYPE &position_type,
+                                        datetime &opened_at)
+     {
+      ticket=0;
+      position_type=POSITION_TYPE_BUY;
+      opened_at=0;
+      for(int index=PositionsTotal()-1;index>=0;index--)
+        {
+         const ulong candidate=PositionGetTicket(index);
+         if(candidate==0 || !PositionSelectByTicket(candidate))
+            continue;
+         if(PositionGetString(POSITION_SYMBOL)!=m_symbol ||
+            PositionGetInteger(POSITION_MAGIC)!=m_magic_number)
+            continue;
+
+         ticket=candidate;
+         position_type=(ENUM_POSITION_TYPE)PositionGetInteger(POSITION_TYPE);
+         opened_at=(datetime)PositionGetInteger(POSITION_TIME);
+         return(true);
+        }
+      return(false);
      }
 
    int               CountFeNXPositions(void)

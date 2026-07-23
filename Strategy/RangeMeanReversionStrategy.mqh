@@ -22,6 +22,16 @@ struct SRangeEntryIntent
    string          reason;
   };
 
+//--- Completed-bar exit intent for an existing range mean-reversion position.
+struct SRangeExitIntent
+  {
+   bool     should_close;
+   double   signal_price;
+   double   range_midpoint;
+   datetime bar_time;
+   string   reason;
+  };
+
 //--- Produces a BUY near RangeLower or SELL near RangeUpper from completed candles only.
 class CRangeMeanReversionStrategy
   {
@@ -80,6 +90,15 @@ private:
       intent.range_midpoint=0.0;
       intent.bar_time=0;
       intent.reason="No completed-bar range entry is available.";
+     }
+
+   void ResetExitIntent(SRangeExitIntent &intent)
+     {
+      intent.should_close=false;
+      intent.signal_price=0.0;
+      intent.range_midpoint=0.0;
+      intent.bar_time=0;
+      intent.reason="No completed-bar range exit is available.";
      }
 
 public:
@@ -172,6 +191,59 @@ public:
          return(true);
         }
       intent.reason="Completed-bar close is away from both range boundaries.";
+      return(false);
+     }
+
+   //--- Closes at the current range midpoint using completed bars only.
+   bool              EvaluateExit(const ENUM_POSITION_TYPE position_type,
+                                  SRangeExitIntent &intent)
+     {
+      ResetExitIntent(intent);
+      if(m_data_bus==NULL || m_symbol!="USDJPY")
+        {
+         intent.reason="Range exit supports USDJPY only.";
+         return(false);
+        }
+
+      double midpoint=0.0;
+      bool range_data_valid=false;
+      if(!ReadDouble(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_MIDPOINT,midpoint) ||
+         !ReadBoolean(FENX_DATABUS_KEY_ENVIRONMENT_RANGE_DATA_VALID,range_data_valid) ||
+         midpoint<=0.0 || !range_data_valid)
+        {
+         intent.reason="Range midpoint is not valid for position exit.";
+         return(false);
+        }
+
+      MqlRates rates[];
+      // The close decision uses only the latest completed candle.
+      if(CopyRates(m_symbol,PERIOD_CURRENT,1,1,rates)!=1)
+        {
+         intent.reason="The latest completed candle is unavailable for position exit.";
+         return(false);
+        }
+
+      intent.signal_price=rates[0].close;
+      intent.range_midpoint=midpoint;
+      intent.bar_time=rates[0].time;
+      if(position_type==POSITION_TYPE_BUY)
+        {
+         intent.should_close=(intent.signal_price>=midpoint);
+         intent.reason=(intent.should_close ?
+                        "Completed-bar close reached the range midpoint for BUY exit." :
+                        "BUY position is waiting for the range midpoint.");
+         return(intent.should_close);
+        }
+      if(position_type==POSITION_TYPE_SELL)
+        {
+         intent.should_close=(intent.signal_price<=midpoint);
+         intent.reason=(intent.should_close ?
+                        "Completed-bar close reached the range midpoint for SELL exit." :
+                        "SELL position is waiting for the range midpoint.");
+         return(intent.should_close);
+        }
+
+      intent.reason="Unsupported position type for range exit.";
       return(false);
      }
 
