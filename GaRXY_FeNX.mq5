@@ -19,6 +19,7 @@
 #include "Standby/StandbyEngine.mqh"
 #include "Risk/RiskEngine.mqh"
 #include "Execution/ExecutionEngine.mqh"
+#include "Test/BacktestValidationReporter.mqh"
 
 //--- Phase3-9.5 execution inputs. Execution remains opt-in for tester safety.
 input bool   InpExecutionEnabled                    = false;
@@ -185,4 +186,13 @@ void OnDeinit(const int reason)
 void OnTick()
   {
    g_controller.Update();
+  }
+
+//+------------------------------------------------------------------+
+//| Strategy Tester validation summary                              |
+//+------------------------------------------------------------------+
+double OnTester(void)
+  {
+   return(FenxReportBacktestValidation(InpExecutionSymbol,
+                                       InpExecutionMagicNumber));
   }

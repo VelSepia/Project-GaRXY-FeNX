@@ -26,6 +26,7 @@ struct SOrderExecutionResult
    bool     accepted;
    long     retcode;
    long     deal_ticket;
+   int      retry_count;
    string   description;
    datetime executed_at;
   };

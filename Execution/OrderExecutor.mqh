@@ -159,6 +159,7 @@ public:
       result.accepted=false;
       result.retcode=0;
       result.deal_ticket=0;
+      result.retry_count=0;
       result.description="";
       result.executed_at=TimeCurrent();
       SOrderRequest attempt=request;
@@ -193,6 +194,7 @@ public:
          result.description=(result.accepted ? "Order accepted." : "Order rejected without a trade result description.");
       if(retry_count>0)
          result.description+=StringFormat(" (transient retries: %d)",retry_count);
+      result.retry_count=retry_count;
       return(result.accepted);
      }
 
@@ -202,6 +204,7 @@ public:
       result.accepted=false;
       result.retcode=0;
       result.deal_ticket=0;
+      result.retry_count=0;
       result.description="";
       result.executed_at=TimeCurrent();
       if(position_ticket==0 || !PositionSelectByTicket(position_ticket))
@@ -249,6 +252,7 @@ public:
          result.description+=" Managed position remains open.";
       if(retry_count>0)
          result.description+=StringFormat(" (close retries: %d)",retry_count);
+      result.retry_count=retry_count;
       result.executed_at=TimeCurrent();
       return(result.accepted);
      }

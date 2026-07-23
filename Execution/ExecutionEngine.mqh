@@ -69,6 +69,19 @@ private:
    int                         m_blocked_order_count;
    int                         m_successful_close_count;
    int                         m_failed_close_count;
+   int                         m_entry_retry_count;
+   int                         m_close_retry_count;
+   int                         m_entry_signal_count;
+   int                         m_entry_block_event_count;
+   int                         m_no_signal_bar_count;
+   int                         m_position_open_event_count;
+   int                         m_position_close_event_count;
+   long                        m_update_count;
+   long                        m_pipeline_block_ticks[FENX_PIPELINE_STAGE_COUNT];
+   long                        m_pipeline_block_events[FENX_PIPELINE_STAGE_COUNT];
+   ENUM_FENX_PIPELINE_STAGE    m_last_pipeline_stage;
+   string                      m_last_pipeline_stage_reason;
+   bool                        m_last_pipeline_blocked;
    int                         m_last_observed_fenx_position_count;
    datetime                    m_last_processed_exit_bar_time;
    string                      m_last_blocked_reason;
@@ -160,16 +173,59 @@ private:
         }
      }
 
+   //--- Records a post-signal execution stop without changing the existing block decision.
+   void RecordEntryBlocked(const string step,const string reason,
+                           SExecutionSnapshot &snapshot)
+     {
+      m_entry_block_event_count++;
+      m_pipeline_block_ticks[FENX_PIPELINE_EXECUTION]++;
+      m_pipeline_block_events[FENX_PIPELINE_EXECUTION]++;
+      CLogger::Info(StringFormat("[PIPELINE] stop=Execution;blocked=true;reason=%s;trace=Execution=%s=BLOCK",
+                                 reason,step));
+      RecordBlocked(reason,snapshot);
+     }
+
    void ObservePositionCount(void)
      {
       const int current_count=m_position_manager.CountFeNXPositions();
       if(current_count==m_last_observed_fenx_position_count)
          return;
       if(current_count<m_last_observed_fenx_position_count)
-         m_trade_logger.InfoOnce("A FeNX USDJPY position is no longer open; broker SL/TP or external closure may have occurred.");
+        {
+         m_position_close_event_count++;
+         m_trade_logger.InfoOnce("[PIPELINE] Position=CLOSED;Close=BROKER_OR_EXTERNAL.");
+        }
       else
-         m_trade_logger.InfoOnce("A FeNX USDJPY position is open.");
+        {
+         m_position_open_event_count++;
+         m_trade_logger.InfoOnce("[PIPELINE] Position=OPEN.");
+        }
       m_last_observed_fenx_position_count=current_count;
+     }
+
+   //--- Counts blocked ticks and state/reason transitions without changing gate decisions.
+   void RecordPipelineResult(const SExecutionGateResult &result)
+     {
+      const bool blocked=!result.allowed;
+      const int stage_index=(int)result.stop_stage;
+      if(blocked && stage_index>=0 && stage_index<FENX_PIPELINE_STAGE_COUNT)
+         m_pipeline_block_ticks[stage_index]++;
+
+      const bool changed=(blocked!=m_last_pipeline_blocked ||
+                          result.stop_stage!=m_last_pipeline_stage ||
+                          result.stage_reason!=m_last_pipeline_stage_reason);
+      if(!changed)
+         return;
+
+      if(blocked && stage_index>=0 && stage_index<FENX_PIPELINE_STAGE_COUNT)
+         m_pipeline_block_events[stage_index]++;
+      CLogger::Info(StringFormat("[PIPELINE] stop=%s;blocked=%s;reason=%s;trace=%s",
+                                 FenxPipelineStageName(result.stop_stage),
+                                 (blocked ? "true" : "false"),result.stage_reason,
+                                 result.pipeline_trace));
+      m_last_pipeline_blocked=blocked;
+      m_last_pipeline_stage=result.stop_stage;
+      m_last_pipeline_stage_reason=result.stage_reason;
      }
 
    //--- Manages an existing FeNX position before evaluating any new-entry gate.
@@ -200,7 +256,7 @@ private:
       m_last_order_request_at=TimeCurrent();
       m_last_global_execution_at=m_last_order_request_at;
       snapshot.last_order_request_at=m_last_order_request_at;
-      m_trade_logger.InfoOnce(StringFormat("Execution close request created for position %I64u.",
+      m_trade_logger.InfoOnce(StringFormat("[PIPELINE] Close=REQUESTED;position=%I64u.",
                                            position_ticket));
 
       SOrderExecutionResult close_result;
@@ -208,14 +264,15 @@ private:
         {
          m_successful_close_count++;
          m_last_execution_result="CLOSE_ACCEPTED: "+close_result.description;
-         m_trade_logger.InfoOnce("Execution position close accepted: "+close_result.description);
+         m_trade_logger.InfoOnce("[PIPELINE] Close=ACCEPTED;"+close_result.description);
         }
       else
         {
          m_failed_close_count++;
          m_last_execution_result="CLOSE_REJECTED: "+close_result.description;
-         m_trade_logger.ErrorOnce("Execution position close rejected: "+close_result.description);
+         m_trade_logger.ErrorOnce("[PIPELINE] Close=REJECTED;"+close_result.description);
         }
+      m_close_retry_count+=close_result.retry_count;
       m_last_execution_retcode=close_result.retcode;
       m_last_execution_deal_ticket=close_result.deal_ticket;
       snapshot.last_execution_result=m_last_execution_result;
@@ -333,6 +390,22 @@ public:
       m_blocked_order_count=0;
       m_successful_close_count=0;
       m_failed_close_count=0;
+      m_entry_retry_count=0;
+      m_close_retry_count=0;
+      m_entry_signal_count=0;
+      m_entry_block_event_count=0;
+      m_no_signal_bar_count=0;
+      m_position_open_event_count=0;
+      m_position_close_event_count=0;
+      m_update_count=0;
+      for(int stage=0;stage<FENX_PIPELINE_STAGE_COUNT;stage++)
+        {
+         m_pipeline_block_ticks[stage]=0;
+         m_pipeline_block_events[stage]=0;
+        }
+      m_last_pipeline_stage=FENX_PIPELINE_EXECUTION;
+      m_last_pipeline_stage_reason="";
+      m_last_pipeline_blocked=false;
       m_last_observed_fenx_position_count=0;
       m_last_processed_exit_bar_time=0;
       m_last_blocked_reason="";
@@ -394,6 +467,7 @@ public:
      {
       if(!m_initialized)
          return;
+      m_update_count++;
 
       SExecutionSnapshot snapshot;
       ResetSnapshot(snapshot);
@@ -426,6 +500,7 @@ public:
       const bool tick_valid=GetTickAndSpread(tick,spread_points,tick_reason);
       SExecutionGateResult gate_result;
       m_gate.Evaluate((tick_valid ? spread_points : -1.0),gate_result);
+      RecordPipelineResult(gate_result);
       snapshot.gate_allowed=gate_result.allowed;
       snapshot.data_valid=gate_result.data_valid;
       snapshot.gate_reason=gate_result.reason;
@@ -476,19 +551,21 @@ public:
       m_last_processed_bar_time=intent.bar_time;
       if(!intent.has_signal)
         {
+         m_no_signal_bar_count++;
          snapshot.gate_reason=intent.reason;
-         m_trade_logger.InfoOnce("Execution no-trade: "+intent.reason);
+         m_trade_logger.InfoOnce("[PIPELINE] Execution=NO_SIGNAL;"+intent.reason);
          PublishSnapshot(snapshot);
          PublishGlobal(snapshot);
          return;
         }
+      m_entry_signal_count++;
 
       SOrderRequest request;
       string request_reason="";
       if(!BuildRequest(intent,tick,gate_result.allocation_multiplier,request,request_reason))
         {
          FillRequestFields(request,snapshot);
-         RecordBlocked(request_reason,snapshot);
+         RecordEntryBlocked("BuildRequest",request_reason,snapshot);
          PublishSnapshot(snapshot);
          PublishGlobal(snapshot);
          return;
@@ -497,7 +574,7 @@ public:
       if(!m_order_executor.Prepare(request,normalized_request,request_reason))
         {
          FillRequestFields(request,snapshot);
-         RecordBlocked(request_reason,snapshot);
+         RecordEntryBlocked("OrderPreparation",request_reason,snapshot);
          PublishSnapshot(snapshot);
          PublishGlobal(snapshot);
          return;
@@ -507,7 +584,7 @@ public:
       if(m_duplicate_guard.IsBlocked(normalized_request,price_tolerance,request_reason))
         {
          snapshot.duplicate_blocked=true;
-         RecordBlocked(request_reason,snapshot);
+         RecordEntryBlocked("DuplicateGuard",request_reason,snapshot);
          PublishSnapshot(snapshot);
          PublishGlobal(snapshot);
          return;
@@ -517,20 +594,24 @@ public:
       m_last_order_request_at=TimeCurrent();
       m_last_global_execution_at=m_last_order_request_at;
       snapshot.last_order_request_at=m_last_order_request_at;
-      m_trade_logger.InfoOnce("Execution request created: "+normalized_request.request_identifier);
+      m_trade_logger.InfoOnce("[PIPELINE] Order=REQUESTED;"+
+                              normalized_request.request_identifier);
       SOrderExecutionResult execution_result;
       if(m_order_executor.Send(normalized_request,execution_result))
         {
          m_successful_order_count++;
          m_last_execution_result="ACCEPTED: "+execution_result.description;
-         m_trade_logger.InfoOnce("Execution order accepted: "+execution_result.description);
+         m_trade_logger.InfoOnce("[PIPELINE] Order=ACCEPTED;Execution order accepted: "+
+                                 execution_result.description);
         }
       else
         {
          m_failed_order_count++;
          m_last_execution_result="REJECTED: "+execution_result.description;
-         m_trade_logger.ErrorOnce("Execution order rejected: "+execution_result.description);
+         m_trade_logger.ErrorOnce("[PIPELINE] Order=REJECTED;Execution order rejected: "+
+                                  execution_result.description);
         }
+      m_entry_retry_count+=execution_result.retry_count;
       m_last_execution_retcode=execution_result.retcode;
       m_last_execution_deal_ticket=execution_result.deal_ticket;
       snapshot.last_execution_result=m_last_execution_result;
@@ -545,6 +626,22 @@ public:
       CLogger::Info(StringFormat("ExecutionEngine shutdown: entries %d successful, %d failed, %d blocked; closes %d successful, %d failed.",
                                  m_successful_order_count,m_failed_order_count,m_blocked_order_count,
                                  m_successful_close_count,m_failed_close_count));
+      CLogger::Info(StringFormat("[BACKTEST_EXECUTION] updates=%I64d;entry_signals=%d;entry_blocks=%d;no_signal_bars=%d;orders_requested=%d;orders_accepted=%d;orders_rejected=%d;closes_requested=%d;closes_accepted=%d;closes_rejected=%d;entry_retries=%d;close_retries=%d;position_open_events=%d;position_close_events=%d",
+                                 m_update_count,m_entry_signal_count,m_entry_block_event_count,
+                                 m_no_signal_bar_count,
+                                 m_successful_order_count+m_failed_order_count,
+                                 m_successful_order_count,m_failed_order_count,
+                                 m_successful_close_count+m_failed_close_count,
+                                 m_successful_close_count,m_failed_close_count,
+                                 m_entry_retry_count,m_close_retry_count,m_position_open_event_count,
+                                 m_position_close_event_count));
+      for(int stage=0;stage<FENX_PIPELINE_STAGE_COUNT;stage++)
+        {
+         CLogger::Info(StringFormat("[BACKTEST_PIPELINE] stage=%s;blocked_ticks=%I64d;block_events=%I64d",
+                                    FenxPipelineStageName((ENUM_FENX_PIPELINE_STAGE)stage),
+                                    m_pipeline_block_ticks[stage],
+                                    m_pipeline_block_events[stage]));
+        }
       m_duplicate_guard.Reset();
       CBaseEngine::Shutdown();
      }
