@@ -201,7 +201,8 @@ private:
 
       environment.market_state=market_state;
       environment.range_score=range_score;
-      environment.trend_score=trend_score;
+      // TrendScore is directional (-100..100); strategy thresholds use magnitude.
+      environment.trend_score=MathAbs(trend_score);
       environment.volatility_score=volatility_score;
       environment.range_data_valid=range_data_valid;
       environment.trend_data_valid=trend_data_valid;

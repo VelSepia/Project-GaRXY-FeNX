@@ -198,7 +198,8 @@ private:
       environment.market_state=market_state;
       environment.market_confidence=market_confidence;
       environment.volatility_score=volatility_score;
-      environment.trend_score=trend_score;
+      // TrendScore is directional (-100..100); downstream style thresholds use magnitude.
+      environment.trend_score=MathAbs(trend_score);
       environment.trend_confidence=trend_confidence;
       environment.range_score=range_score;
       environment.range_data_valid=range_data_valid;
